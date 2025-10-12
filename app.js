@@ -126,9 +126,7 @@ function showBookDetail(bookId) {
         
         <div class="overall-review-section">
             <h3 class="section-title">全体の感想</h3>
-            <div class="overall-review-content">
-                ${book.overallReview}
-            </div>
+            <div class="overall-review-content">${book.overallReview}</div>
         </div>
         
         ${quotesHTML}
@@ -170,8 +168,10 @@ function generatePrompt(bookId) {
     if (book.quotes && book.quotes.length > 0) {
         quotesText = book.quotes.map((quote, index) => `
 【引用${index + 1}】${quote.source}
+【引用】
 「${quote.text}」
 
+【感想】
 ${quote.comment}
 `).join('\n');
     }
