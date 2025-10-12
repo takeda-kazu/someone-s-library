@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>library_watch</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="books-data.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <!-- ヘッダー: アプリのタイトル -->
+    <header>
+        <h1>●●の本棚</h1>
+    </header>
+
+    <!-- メインコンテナ -->
+    <main id="app">
+        <!-- SC1: 一覧画面 -->
+        <section id="screen-list" class="screen">
+            <div id="book-list"></div>
+        </section>
+
+        <!-- SC2: 詳細画面 -->
+        <section id="screen-detail" class="screen" style="display: none;">
+            <button id="back-btn" class="back-button">← 戻る</button>
+            <div id="book-detail-content">
+                <!-- ここに本の詳細が動的に表示されます -->
+            </div>
+        </section>
+    </main>
+
+    <!-- プロンプト表示モーダル -->
+    <div id="prompt-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>上司と対話するプロンプト</h2>
+                <button id="close-modal-x" class="close-x">×</button>
+            </div>
+            <textarea id="prompt-text" class="prompt-textarea" readonly></textarea>
+            <div class="modal-buttons">
+                <button id="copy-btn" class="copy-button">📋 コピー</button>
+                <button id="close-modal-btn" class="close-button">閉じる</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
