@@ -174,7 +174,6 @@ function generatePrompt(bookId) {
 【引用${index + 1}】${quote.source}
 「${quote.text}」
 
-上司の感想：
 ${quote.comment}
 `).join('\n');
     }
