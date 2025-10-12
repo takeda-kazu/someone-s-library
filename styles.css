@@ -5,97 +5,103 @@
     box-sizing: border-box;
 }
 
-/* CSS変数: 色やサイズを定義（後で使いまわせる） */
+/* CSS変数: 色やサイズを定義（nautsスタイル - ミニマル） */
 :root {
-    --color-primary: #3b82f6;        /* 青色（メインカラー） */
-    --color-secondary: #10b981;      /* 緑色（アクセント） */
-    --color-bg-main: #f8fafc;        /* 明るいグレー（背景） */
+    --color-primary: #000000;        /* 黒（メインカラー） */
+    --color-secondary: #000000;      /* 黒（アクセント） */
+    --color-bg-main: #ffffff;        /* 白（背景） */
     --color-bg-card: #ffffff;        /* 白（カード背景） */
-    --color-text-primary: #1e293b;   /* 濃いグレー（メインテキスト） */
-    --color-text-secondary: #64748b; /* グレー（サブテキスト） */
+    --color-text-primary: #000000;   /* 黒（メインテキスト） */
+    --color-text-secondary: #666666; /* グレー（サブテキスト） */
+    --color-border: #e5e5e5;         /* ライトグレー（ボーダー） */
     --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
+    --spacing-lg: 32px;
+    --spacing-xl: 48px;
+    --spacing-xxl: 64px;
 }
 
 /* bodyのスタイル */
 body {
-    font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Noto Sans JP', sans-serif;
     background-color: var(--color-bg-main);
     color: var(--color-text-primary);
-    line-height: 1.6;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
 }
 
 /* ヘッダーのスタイル */
 header {
     background-color: white;
-    padding: var(--spacing-lg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-xxl) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
 }
 
 /* ヘッダー内のタイトル（h1） */
 header h1 {
     color: var(--color-primary);
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 400;
     text-align: center;
+    letter-spacing: 0.1em;
 }
 
 /* メインコンテナ */
 #app {
-    max-width: 1200px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xxl) var(--spacing-lg);
 }
 
-/* 本のカード一覧（グリッドレイアウト） */
+/* 本のカード一覧（リストレイアウト） */
 #book-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     margin-top: var(--spacing-lg);
 }
 
 /* 本のカード */
 .book-card {
-    background-color: var(--color-bg-card);
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: box-shadow 0.3s ease;
+    background-color: transparent;
+    padding: var(--spacing-xl) 0;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
+    transition: opacity 0.3s ease;
 }
 
 /* カードホバー時のエフェクト */
 .book-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    opacity: 0.6;
 }
 
 /* 本のタイトル */
 .book-title {
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 20px;
+    font-weight: 400;
     color: var(--color-text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
 }
 
 /* 著者名 */
 .book-author {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-secondary);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    font-weight: 300;
 }
 
 /* 感想要約 */
 .book-summary {
-    font-size: 14px;
-    color: #475569;
-    line-height: 1.6;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: 300;
 }
 
 /* SC2: 詳細画面 */
@@ -109,125 +115,136 @@ header h1 {
     background-color: transparent;
     border: none;
     color: var(--color-text-secondary);
-    font-size: 16px;
-    padding: 8px 16px;
+    font-size: 13px;
+    padding: 0;
     cursor: pointer;
-    margin-bottom: var(--spacing-lg);
-    transition: color 0.3s ease;
+    margin-bottom: var(--spacing-xl);
+    transition: opacity 0.3s ease;
+    font-weight: 300;
 }
 
 .back-button:hover {
-    color: var(--color-primary);
+    opacity: 0.6;
 }
 
 /* 本の詳細情報 */
 .book-detail-info {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-xxl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .detail-title {
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 32px;
+    font-weight: 400;
     color: var(--color-text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
 }
 
 .detail-author {
-    font-size: 18px;
+    font-size: 14px;
     color: var(--color-text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 20px;
+    font-weight: 300;
 }
 
 .detail-summary {
     font-size: 14px;
     color: var(--color-text-secondary);
-    font-style: italic;
-    margin-bottom: 16px;
+    line-height: 1.8;
+    margin-bottom: 0;
+    font-weight: 300;
 }
 
 /* 全体の感想セクション */
 .overall-review-section {
-    background-color: #fff9c4;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: var(--spacing-lg);
-    border-left: 4px solid #f59e0b;
+    background-color: transparent;
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .section-title {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 400;
     color: var(--color-text-primary);
-    margin-bottom: 12px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
 }
 
 .overall-review-content {
-    font-size: 16px;
-    color: #475569;
-    line-height: 1.8;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.9;
     white-space: pre-wrap;
+    font-weight: 300;
 }
 
 /* 引用セクション */
 .quote-section {
-    background-color: #f8fafc;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: var(--spacing-lg);
-    border-left: 4px solid var(--color-primary);
+    background-color: transparent;
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .quote-header {
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--color-primary);
-    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--color-text-secondary);
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
 }
 
 .quote-text {
-    font-size: 15px;
-    color: #334155;
-    line-height: 1.8;
-    padding: 12px;
-    background-color: white;
-    border-radius: 8px;
-    margin-bottom: 12px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    line-height: 1.9;
+    padding: 0;
+    padding-left: 20px;
+    border-left: 2px solid var(--color-border);
+    margin-bottom: 20px;
     white-space: pre-wrap;
+    font-weight: 300;
 }
 
 .quote-comment {
-    font-size: 15px;
-    color: #475569;
-    line-height: 1.8;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.9;
     white-space: pre-wrap;
+    font-weight: 300;
 }
 
 .quote-comment strong {
     color: var(--color-text-primary);
+    font-weight: 400;
 }
 
 /* 上司と対話ボタン */
 .dialog-button {
     width: 100%;
-    height: 48px;
+    height: 54px;
     background-color: var(--color-primary);
     color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: bold;
+    border: 1px solid var(--color-primary);
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    transition: opacity 0.3s ease;
+    margin-top: var(--spacing-xl);
 }
 
 .dialog-button:hover {
-    background-color: #2563eb;
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    opacity: 0.7;
 }
 
 .dialog-button:active {
-    transform: translateY(1px);
+    transform: none;
 }
 
 /* モーダル全体 */
@@ -250,19 +267,19 @@ header h1 {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 /* モーダルのコンテンツボックス */
 .modal-content {
     position: relative;
     background-color: white;
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 600px;
+    border-radius: 0;
+    padding: 40px;
+    max-width: 640px;
     width: 90%;
     max-height: 80vh;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1001;
 }
 
@@ -271,53 +288,58 @@ header h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h2 {
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
+    font-weight: 400;
     color: var(--color-text-primary);
     margin: 0;
+    letter-spacing: 0.05em;
 }
 
 /* ×ボタン */
 .close-x {
     background-color: transparent;
     border: none;
-    font-size: 28px;
+    font-size: 24px;
     color: var(--color-text-secondary);
     cursor: pointer;
     padding: 0;
     width: 32px;
     height: 32px;
     line-height: 1;
-    transition: color 0.3s ease;
+    transition: opacity 0.3s ease;
+    font-weight: 300;
 }
 
 .close-x:hover {
-    color: var(--color-text-primary);
+    opacity: 0.6;
 }
 
 /* プロンプトテキストエリア */
 .prompt-textarea {
     width: 100%;
     height: 300px;
-    padding: 16px;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: 20px;
+    background-color: #fafafa;
+    border: 1px solid var(--color-border);
+    border-radius: 0;
+    font-size: 13px;
     font-family: 'Courier New', monospace;
-    color: #475569;
+    color: var(--color-text-secondary);
     resize: vertical;
-    margin-bottom: 16px;
-    line-height: 1.6;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    font-weight: 300;
 }
 
 .prompt-textarea:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline: 1px solid var(--color-text-secondary);
+    outline-offset: 0;
 }
 
 /* モーダルボタングループ */
@@ -329,72 +351,79 @@ header h1 {
 /* コピーボタン */
 .copy-button {
     flex: 1;
-    height: 44px;
-    background-color: #10b981;
+    height: 50px;
+    background-color: var(--color-primary);
     color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
+    border: 1px solid var(--color-primary);
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .copy-button:hover {
-    background-color: #059669;
+    opacity: 0.7;
 }
 
 /* 閉じるボタン */
 .close-button {
     flex: 1;
-    height: 44px;
-    background-color: #f1f5f9;
+    height: 50px;
+    background-color: transparent;
     color: var(--color-text-secondary);
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: opacity 0.3s ease;
 }
 
 .close-button:hover {
-    background-color: #e2e8f0;
+    opacity: 0.6;
 }
 
 /* レスポンシブ: スマホ（幅768px未満） */
 @media (max-width: 768px) {
+    header {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
     header h1 {
-        font-size: 20px;
+        font-size: 12px;
     }
     
     #app {
-        padding: 16px;
+        padding: var(--spacing-lg) var(--spacing-md);
     }
     
-    #book-list {
-        grid-template-columns: 1fr;
+    .detail-title {
+        font-size: 24px;
+    }
+    
+    .modal-content {
+        padding: 24px;
+    }
+    
+    .book-card {
+        padding: var(--spacing-lg) 0;
     }
 }
 
 /* レスポンシブ: タブレット（幅768px以上1024px未満） */
 @media (min-width: 768px) and (max-width: 1024px) {
     #app {
-        padding: var(--spacing-lg);
-    }
-    
-    #book-list {
-        grid-template-columns: repeat(2, 1fr);
+        padding: var(--spacing-xl) var(--spacing-lg);
     }
 }
 
 /* レスポンシブ: デスクトップ（幅1024px以上） */
 @media (min-width: 1024px) {
     #app {
-        max-width: 1200px;
-    }
-    
-    #book-list {
-        grid-template-columns: repeat(3, 1fr);
+        max-width: 900px;
     }
 }
 

@@ -112,7 +112,6 @@ function showBookDetail(bookId) {
                 <h4 class="quote-header">【引用${index + 1}】${quote.source}</h4>
                 <div class="quote-text">「${quote.text}」</div>
                 <div class="quote-comment">
-                    <strong>→ 上司の感想：</strong><br>
                     ${quote.comment}
                 </div>
             </div>
