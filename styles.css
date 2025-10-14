@@ -420,6 +420,52 @@ header h1 {
     }
 }
 
+/* コピー成功モーダル */
+.copy-success-modal {
+    z-index: 1001; /* プロンプトモーダルより上に表示 */
+}
+
+.copy-success-content {
+    max-width: 400px;
+    text-align: center;
+    padding: 40px 32px;
+}
+
+.copy-success-header h2 {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+.copy-success-message {
+    margin: 24px 0 32px 0;
+}
+
+.copy-success-message p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    font-weight: 300;
+}
+
+.copy-success-content .modal-buttons {
+    justify-content: center;
+}
+
+.copy-success-content .close-button {
+    min-width: 120px;
+    background-color: var(--color-primary);
+    color: white;
+    border: 1px solid var(--color-primary);
+}
+
+.copy-success-content .close-button:hover {
+    opacity: 0.7;
+}
+
 /* レスポンシブ: デスクトップ（幅1024px以上） */
 @media (min-width: 1024px) {
     #app {

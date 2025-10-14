@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // モーダルのイベントリスナーを設定
     setupModalEventListeners();
+    
+    // コピー成功モーダルのイベントリスナーを設定
+    setupCopySuccessModalEventListeners();
 });
 
 // 本の一覧をカード形式で表示する関数
@@ -329,10 +332,62 @@ function copyPromptToClipboard() {
                     copyBtn.textContent = originalText;
                 }, 2000);
             }
+            
+            // 追加のモーダルを表示
+            showCopySuccessModal();
         })
         .catch(function(err) {
             console.error('[copy] failed', err);
             alert('コピーに失敗しました。手動でコピーしてください。');
         });
+}
+
+// コピー成功モーダルを表示する関数
+function showCopySuccessModal() {
+    const modal = document.getElementById('copy-success-modal');
+    
+    if (!modal) {
+        console.error('[error] copy-success-modal not found');
+        return;
+    }
+    
+    // モーダルを表示
+    modal.style.display = 'flex';
+    console.log('[modal] copy success modal opened');
+}
+
+// コピー成功モーダルを閉じる関数
+function closeCopySuccessModal() {
+    const modal = document.getElementById('copy-success-modal');
+    
+    if (!modal) {
+        console.error('[error] copy-success-modal not found');
+        return;
+    }
+    
+    // モーダルを非表示
+    modal.style.display = 'none';
+    console.log('[modal] copy success modal closed');
+}
+
+// コピー成功モーダルのイベントリスナーを設定
+function setupCopySuccessModalEventListeners() {
+    // 閉じるボタン
+    const closeBtn = document.getElementById('close-copy-success-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            console.log('[click] close copy success button');
+            closeCopySuccessModal();
+        });
+    }
+    
+    // ×ボタン
+    const closeX = document.getElementById('close-copy-success-x');
+    if (closeX) {
+        closeX.addEventListener('click', function() {
+            console.log('[click] close copy success x button');
+            closeCopySuccessModal();
+        });
+    }
 }
 
