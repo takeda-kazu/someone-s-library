@@ -3,7 +3,7 @@ let currentScreen = 'list';  // 現在の画面（'list', 'detail', 'edit'）
 let selectedBookId = null;   // 選択中の本のID
 let isAdminMode = false;     // 管理モードかどうか
 let currentUser = null;      // 現在のユーザー
-let booksData = [];          // 本のデータ（Firebaseから取得）
+let firebaseBooksData = [];  // 本のデータ（Firebaseから取得）
 
 // アプリケーションの初期化
 document.addEventListener('DOMContentLoaded', function() {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         await loadBooksFromFirebase();
         
         // データが空の場合は初期データを移行
-        if (booksData.length === 0 && window.booksData && window.booksData.length > 0) {
+        if (firebaseBooksData.length === 0 && window.booksData && window.booksData.length > 0) {
             console.log('[migration] migrating initial data to Firebase');
             await migrateInitialDataToFirebase();
         }
@@ -123,7 +123,7 @@ function displayBookList() {
     bookListContainer.innerHTML = '';
     
     // データが空の場合は初期データを表示
-    const dataToDisplay = booksData.length > 0 ? booksData : window.booksData || [];
+    const dataToDisplay = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
     
     // 各本のカードを作成
     dataToDisplay.forEach(book => {
@@ -225,7 +225,7 @@ function showScreen(screenName) {
 // 本の詳細を表示する関数
 function showBookDetail(bookId) {
     // 本のデータを取得
-    const currentData = booksData.length > 0 ? booksData : window.booksData || [];
+    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
     const book = currentData.find(b => b.id === bookId);
     
     if (!book) {
@@ -681,7 +681,7 @@ function filterBooks() {
     const selectedAuthor = authorFilter.value;
     
     // 現在表示中の本を取得
-    const currentData = booksData.length > 0 ? booksData : window.booksData || [];
+    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
     
     // フィルタリング
     const filteredBooks = currentData.filter(book => {
@@ -761,7 +761,7 @@ function editBook(bookId) {
     console.log('[action] edit book:', bookId);
     
     // 本のデータを取得
-    const currentData = booksData.length > 0 ? booksData : window.booksData || [];
+    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
     const book = currentData.find(b => b.id === bookId);
     
     if (!book) {
@@ -991,19 +991,19 @@ async function loadBooksFromFirebase() {
         const q = query(booksRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         
-        booksData = [];
+        firebaseBooksData = [];
         querySnapshot.forEach((doc) => {
             const bookData = doc.data();
             bookData.id = doc.id;
-            booksData.push(bookData);
+            firebaseBooksData.push(bookData);
         });
         
-        console.log('[firebase] loaded', booksData.length, 'books');
+        console.log('[firebase] loaded', firebaseBooksData.length, 'books');
         
     } catch (error) {
         console.error('[firebase] load failed:', error);
         // Firebase読み込みに失敗した場合は、ローカルデータを使用
-        booksData = window.booksData || [];
+        firebaseBooksData = window.booksData || [];
     }
 }
 
