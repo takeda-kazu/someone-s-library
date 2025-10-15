@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[app] library_watch started');
     
     // Firebase初期化を待つ
-    waitForFirebase().then(() => {
+    waitForFirebase().then(async () => {
         // 認証状態の監視
         setupAuthStateListener();
         
@@ -199,24 +199,34 @@ function createBookCard(book) {
 function showScreen(screenName) {
     const listScreen = document.getElementById('screen-list');
     const detailScreen = document.getElementById('screen-detail');
+    const editScreen = document.getElementById('screen-edit');
     
     if (screenName === 'list') {
         listScreen.style.display = 'block';
         detailScreen.style.display = 'none';
+        if (editScreen) editScreen.style.display = 'none';
         currentScreen = 'list';
         console.log('[nav] show screen: list');
     } else if (screenName === 'detail') {
         listScreen.style.display = 'none';
         detailScreen.style.display = 'block';
+        if (editScreen) editScreen.style.display = 'none';
         currentScreen = 'detail';
         console.log('[nav] show screen: detail, bookId:', selectedBookId);
+    } else if (screenName === 'edit') {
+        listScreen.style.display = 'none';
+        detailScreen.style.display = 'none';
+        if (editScreen) editScreen.style.display = 'block';
+        currentScreen = 'edit';
+        console.log('[nav] show screen: edit');
     }
 }
 
 // 本の詳細を表示する関数
 function showBookDetail(bookId) {
     // 本のデータを取得
-    const book = booksData.find(b => b.id === bookId);
+    const currentData = booksData.length > 0 ? booksData : window.booksData || [];
+    const book = currentData.find(b => b.id === bookId);
     
     if (!book) {
         console.error('[error] book not found, bookId:', bookId);
@@ -1001,87 +1011,41 @@ async function loadBooksFromFirebase() {
 async function addBookToFirebase(bookData) {
     const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
     
-    // 引用文をサブコレクションに保存
+    // 本の基本情報を保存（引用文も一緒に保存）
     const bookRef = await addDoc(collection(window.firebaseDb, 'books'), {
         title: bookData.title,
         author: bookData.author,
         summary: bookData.summary,
         overallReview: bookData.overallReview,
+        quotes: bookData.quotes || [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
-    
-    // 引用文をサブコレクションに保存
-    if (bookData.quotes && bookData.quotes.length > 0) {
-        const { subCollection, addDoc } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-        const quotesRef = subCollection(window.firebaseDb, 'books', bookRef.id, 'quotes');
-        
-        for (const quote of bookData.quotes) {
-            await addDoc(quotesRef, {
-                source: quote.source,
-                text: quote.text,
-                comment: quote.comment,
-                createdAt: serverTimestamp()
-            });
-        }
-    }
     
     return bookRef.id;
 }
 
 // 本をFirebaseで更新
 async function updateBookInFirebase(bookData) {
-    const { doc, updateDoc, serverTimestamp, collection, getDocs, deleteDoc } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
+    const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
     
-    // 基本情報を更新
+    // 基本情報と引用文を更新
     const bookRef = doc(window.firebaseDb, 'books', bookData.id);
     await updateDoc(bookRef, {
         title: bookData.title,
         author: bookData.author,
         summary: bookData.summary,
         overallReview: bookData.overallReview,
+        quotes: bookData.quotes || [],
         updatedAt: serverTimestamp()
     });
-    
-    // 既存の引用文を削除
-    const quotesRef = collection(window.firebaseDb, 'books', bookData.id, 'quotes');
-    const quotesSnapshot = await getDocs(quotesRef);
-    
-    const deletePromises = quotesSnapshot.docs.map(quoteDoc => 
-        deleteDoc(doc(window.firebaseDb, 'books', bookData.id, 'quotes', quoteDoc.id))
-    );
-    await Promise.all(deletePromises);
-    
-    // 新しい引用文を追加
-    if (bookData.quotes && bookData.quotes.length > 0) {
-        const { subCollection, addDoc } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-        const newQuotesRef = subCollection(window.firebaseDb, 'books', bookData.id, 'quotes');
-        
-        for (const quote of bookData.quotes) {
-            await addDoc(newQuotesRef, {
-                source: quote.source,
-                text: quote.text,
-                comment: quote.comment,
-                createdAt: serverTimestamp()
-            });
-        }
-    }
 }
 
 // 本をFirebaseから削除
 async function deleteBookFromFirebase(bookId) {
-    const { doc, deleteDoc, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
+    const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
     
-    // 引用文を削除
-    const quotesRef = collection(window.firebaseDb, 'books', bookId, 'quotes');
-    const quotesSnapshot = await getDocs(quotesRef);
-    
-    const deletePromises = quotesSnapshot.docs.map(quoteDoc => 
-        deleteDoc(doc(window.firebaseDb, 'books', bookId, 'quotes', quoteDoc.id))
-    );
-    await Promise.all(deletePromises);
-    
-    // 本を削除
+    // 本を削除（引用文も一緒に削除される）
     const bookRef = doc(window.firebaseDb, 'books', bookId);
     await deleteDoc(bookRef);
 }
