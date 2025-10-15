@@ -5,51 +5,66 @@
     box-sizing: border-box;
 }
 
-/* CSS変数: 色やサイズを定義（nautsスタイル - ミニマル） */
+/* CSS変数: 色やサイズを定義（洗練されたスタイリッシュデザイン） */
 :root {
-    --color-primary: #000000;        /* 黒（メインカラー） */
-    --color-secondary: #000000;      /* 黒（アクセント） */
+    --color-primary: #007cba;        /* 信頼感のある青（メインカラー） */
+    --color-secondary: #666666;      /* 落ち着いたグレー（アクセント） */
     --color-bg-main: #ffffff;        /* 白（背景） */
-    --color-bg-card: #ffffff;        /* 白（カード背景） */
+    --color-bg-card: rgba(255, 255, 255, 0.9); /* 半透明白（カード背景） */
     --color-text-primary: #000000;   /* 黒（メインテキスト） */
     --color-text-secondary: #666666; /* グレー（サブテキスト） */
-    --color-border: #e5e5e5;         /* ライトグレー（ボーダー） */
+    --color-border: rgba(0, 124, 186, 0.1); /* プライマリーカラーの薄いボーダー */
+    --spacing-sm: 8px;
     --spacing-md: 16px;
-    --spacing-lg: 32px;
-    --spacing-xl: 48px;
-    --spacing-xxl: 64px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-xxl: 48px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
 }
 
 /* bodyのスタイル */
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Noto Sans JP', sans-serif;
-    background-color: var(--color-bg-main);
+    background: linear-gradient(135deg, #f8fafc 0%, #e0f2ff 100%);
     color: var(--color-text-primary);
-    line-height: 1.8;
+    line-height: 1.6;
     letter-spacing: 0.02em;
+    min-height: 100vh;
 }
 
 /* ヘッダーのスタイル */
 header {
-    background-color: white;
-    padding: var(--spacing-xxl) var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: var(--spacing-xl) var(--spacing-lg);
     border-bottom: 1px solid var(--color-border);
+    box-shadow: 0 8px 32px rgba(0, 124, 186, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 /* ヘッダー内のタイトル（h1） */
 header h1 {
     color: var(--color-primary);
-    font-size: 20px;
-    font-weight: 500;
+    font-size: 32px;
+    font-weight: 700;
     text-align: center;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #005a8c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* メインコンテナ */
 #app {
     max-width: 900px;
     margin: 0 auto;
-    padding: var(--spacing-xxl) var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-lg);
 }
 
 /* 本のカード一覧（リストレイアウト） */
@@ -62,46 +77,74 @@ header h1 {
 
 /* 本のカード */
 .book-card {
-    background-color: transparent;
-    padding: var(--spacing-xl) 0;
-    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    backdrop-filter: blur(10px);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 124, 186, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.book-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary) 0%, #4db8d4 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
 /* カードホバー時のエフェクト */
 .book-card:hover {
-    opacity: 0.6;
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 124, 186, 0.15);
+    border-color: #4db8d4;
+}
+
+.book-card:hover::before {
+    transform: scaleX(1);
 }
 
 /* 本のタイトル */
 .book-title {
-    font-size: 20px;
-    font-weight: 400;
+    font-size: 24px;
+    font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: 12px;
-    letter-spacing: 0.02em;
+    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.01em;
+    line-height: 1.3;
 }
 
 /* 著者名 */
 .book-author {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--color-text-secondary);
-    margin-bottom: 16px;
-    font-weight: 300;
+    margin-bottom: var(--spacing-md);
+    font-weight: 500;
+    letter-spacing: 0.01em;
 }
 
 /* 感想要約 */
 .book-summary {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--color-text-secondary);
-    line-height: 1.8;
+    line-height: 1.6;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: 300;
+    font-weight: 400;
+    margin-bottom: var(--spacing-lg);
 }
 
 /* SC2: 詳細画面 */
@@ -112,19 +155,39 @@ header h1 {
 
 /* 戻るボタン */
 .back-button {
-    background-color: transparent;
+    background: linear-gradient(135deg, var(--color-primary) 0%, #005a8c 100%);
     border: none;
-    color: var(--color-text-secondary);
-    font-size: 13px;
-    padding: 0;
+    color: white;
+    font-size: 16px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
     cursor: pointer;
     margin-bottom: var(--spacing-xl);
-    transition: opacity 0.3s ease;
-    font-weight: 300;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.back-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
 }
 
 .back-button:hover {
-    opacity: 0.6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 124, 186, 0.4);
+}
+
+.back-button:hover::before {
+    left: 100%;
 }
 
 /* 本の詳細情報 */
@@ -136,26 +199,27 @@ header h1 {
 
 .detail-title {
     font-size: 32px;
-    font-weight: 400;
+    font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: 16px;
-    letter-spacing: 0.02em;
-    line-height: 1.4;
+    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.01em;
+    line-height: 1.3;
 }
 
 .detail-author {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--color-text-secondary);
-    margin-bottom: 20px;
-    font-weight: 300;
+    margin-bottom: var(--spacing-lg);
+    font-weight: 500;
+    letter-spacing: 0.01em;
 }
 
 .detail-summary {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--color-text-secondary);
-    line-height: 1.8;
+    line-height: 1.6;
     margin-bottom: 0;
-    font-weight: 300;
+    font-weight: 400;
 }
 
 /* 全体の感想セクション */
@@ -352,19 +416,21 @@ header h1 {
 .copy-button {
     flex: 1;
     height: 50px;
-    background-color: var(--color-primary);
+    background: linear-gradient(135deg, var(--color-primary) 0%, #005a8c 100%);
     color: white;
-    border: 1px solid var(--color-primary);
-    border-radius: 0;
+    border: none;
+    border-radius: var(--radius-md);
     font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 124, 186, 0.3);
 }
 
 .copy-button:hover {
-    opacity: 0.7;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 124, 186, 0.4);
 }
 
 /* 閉じるボタン */
@@ -374,16 +440,17 @@ header h1 {
     background-color: transparent;
     color: var(--color-text-secondary);
     border: 1px solid var(--color-border);
-    border-radius: 0;
+    border-radius: var(--radius-md);
     font-size: 14px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .close-button:hover {
-    opacity: 0.6;
+    background-color: var(--color-border);
+    transform: translateY(-2px);
 }
 
 /* レスポンシブ: スマホ（幅768px未満） */
@@ -393,11 +460,24 @@ header h1 {
     }
     
     header h1 {
-        font-size: 12px;
+        font-size: 24px;
     }
     
     #app {
-        padding: var(--spacing-lg) var(--spacing-md);
+        padding: var(--spacing-md);
+    }
+    
+    .book-card {
+        padding: var(--spacing-lg);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .book-title {
+        font-size: 20px;
+    }
+    
+    .book-summary {
+        -webkit-line-clamp: 2;
     }
     
     .detail-title {
@@ -405,11 +485,8 @@ header h1 {
     }
     
     .modal-content {
-        padding: 24px;
-    }
-    
-    .book-card {
-        padding: var(--spacing-lg) 0;
+        padding: var(--spacing-lg);
+        margin: var(--spacing-md);
     }
 }
 
