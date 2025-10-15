@@ -5,6 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>library_watch</title>
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC-MaNFGTLeTsRLg8m5eXHc4qjrmwZpag4",
+            authDomain: "takeda-649ef.firebaseapp.com",
+            projectId: "takeda-649ef",
+            storageBucket: "takeda-649ef.firebasestorage.app",
+            messagingSenderId: "422163907833",
+            appId: "1:422163907833:web:7ac41941d2e14083f84e28",
+            measurementId: "G-5JBQQSMZ1T"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // グローバル変数として設定
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        
+        console.log('Firebase initialized successfully');
+    </script>
+    
     <script src="books-data.js"></script>
     <script src="app.js"></script>
 </head>
@@ -12,12 +44,26 @@
     <!-- ヘッダー: アプリのタイトル -->
     <header>
         <h1>●●の本棚</h1>
+        <!-- 管理モード切り替えボタン -->
+        <div class="admin-controls">
+            <button id="admin-mode-btn" class="admin-button">管理モード</button>
+            <button id="normal-mode-btn" class="admin-button" style="display: none;">通常モードに戻る</button>
+        </div>
     </header>
 
     <!-- メインコンテナ -->
     <main id="app">
         <!-- SC1: 一覧画面 -->
         <section id="screen-list" class="screen">
+            <!-- 検索・フィルター機能（管理モード時のみ表示） -->
+            <div id="search-controls" class="search-controls" style="display: none;">
+                <input type="text" id="search-input" placeholder="本を検索..." class="search-input">
+                <select id="author-filter" class="author-filter">
+                    <option value="">すべての著者</option>
+                </select>
+                <button id="add-book-btn" class="add-book-button">新規追加</button>
+            </div>
+            
             <div id="book-list"></div>
         </section>
 
@@ -28,7 +74,34 @@
                 <!-- ここに本の詳細が動的に表示されます -->
             </div>
         </section>
+
+        <!-- SC3: 追加・編集画面（管理モード時のみ表示） -->
+        <section id="screen-edit" class="screen" style="display: none;">
+            <button id="back-edit-btn" class="back-button">← 一覧に戻る</button>
+            <div id="book-edit-content">
+                <!-- ここに本の追加・編集フォームが動的に表示されます -->
+            </div>
+        </section>
     </main>
+
+    <!-- 認証モーダル -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>管理モード認証</h2>
+                <button id="close-auth-modal-x" class="close-x">×</button>
+            </div>
+            <div class="auth-form">
+                <input type="email" id="auth-email" placeholder="メールアドレス" class="auth-input">
+                <input type="password" id="auth-password" placeholder="パスワード" class="auth-input">
+                <button id="auth-login-btn" class="auth-button">ログイン</button>
+            </div>
+            <div class="modal-buttons">
+                <button id="close-auth-modal-btn" class="close-button">キャンセル</button>
+            </div>
+        </div>
+    </div>
 
     <!-- プロンプト表示モーダル -->
     <div id="prompt-modal" class="modal" style="display: none;">
