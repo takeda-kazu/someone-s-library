@@ -123,7 +123,7 @@ function displayBookList() {
     bookListContainer.innerHTML = '';
     
     // データが空の場合は初期データを表示
-    const dataToDisplay = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
+    const dataToDisplay = window.booksData || [];
     
     // 各本のカードを作成
     dataToDisplay.forEach(book => {
@@ -307,8 +307,8 @@ function showBookDetail(bookId) {
 // プロンプトを自動生成する関数
 function generatePrompt(bookId) {
     // 本のデータを取得
-    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
-    const book = currentData.find(b => b.id === bookId);
+    const currentData = window.booksData || [];
+    const book = currentData.find(b => b.id == bookId); // == を使用して型変換を許可
     
     console.log('[debug] generatePrompt called with bookId:', bookId);
     console.log('[debug] currentData length:', currentData.length);
