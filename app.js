@@ -320,9 +320,12 @@ function showBookDetail(bookId) {
 function generatePrompt(bookId) {
     // 本のデータを取得
     const currentData = window.booksData || [];
-    const book = currentData.find(b => b.id == bookId); // == を使用して型変換を許可
+    // bookIdを数値に変換してから検索
+    const numericBookId = parseInt(bookId);
+    const book = currentData.find(b => b.id === numericBookId);
     
-    console.log('[debug] generatePrompt called with bookId:', bookId);
+    console.log('[debug] generatePrompt called with bookId:', bookId, typeof bookId);
+    console.log('[debug] converted to numericBookId:', numericBookId, typeof numericBookId);
     console.log('[debug] currentData length:', currentData.length);
     console.log('[debug] found book:', book);
     
