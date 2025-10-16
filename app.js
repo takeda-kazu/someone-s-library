@@ -310,6 +310,10 @@ function generatePrompt(bookId) {
     const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
     const book = currentData.find(b => b.id === bookId);
     
+    console.log('[debug] generatePrompt called with bookId:', bookId);
+    console.log('[debug] currentData length:', currentData.length);
+    console.log('[debug] found book:', book);
+    
     if (!book) {
         console.error('[error] book not found for prompt generation, bookId:', bookId);
         return '';
@@ -367,6 +371,9 @@ ${quotesText}
 - 温かみのある、やや硬めだが親しみやすい口調で話してください
 - 表面的な答えではなく、深い理解と気づきを促すような対話を心がけてください
 - 社員が気軽に質問できる雰囲気を作ってください`;
+    
+    console.log('[debug] generated prompt length:', prompt.length);
+    console.log('[debug] prompt preview:', prompt.substring(0, 200) + '...');
     
     return prompt;
 }
