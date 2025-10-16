@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>library_watch</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBs8q4LIEnYpqk_PzaJwZO7I7C9gWu6MIk",
+            authDomain: "library-6632c.firebaseapp.com",
+            projectId: "library-6632c",
+            storageBucket: "library-6632c.firebasestorage.app",
+            messagingSenderId: "475019124517",
+            appId: "1:475019124517:web:69e3e6d5d81467a61944cc",
+            measurementId: "G-8GWPSS67D1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // グローバル変数として設定
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        
+        console.log('Firebase initialized successfully');
+    </script>
+    
+    <script src="books-data.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <!-- ヘッダー: アプリのタイトル -->
+    <header>
+        <h1>●●の本棚</h1>
+        <!-- 管理モード切り替えボタン -->
+        <div class="admin-controls">
+            <button id="admin-mode-btn" class="admin-button">管理モード</button>
+            <button id="normal-mode-btn" class="admin-button" style="display: none;">通常モードに戻る</button>
+        </div>
+    </header>
+
+    <!-- メインコンテナ -->
+    <main id="app">
+        <!-- SC1: 一覧画面 -->
+        <section id="screen-list" class="screen">
+            <!-- 検索・フィルター機能（管理モード時のみ表示） -->
+            <div id="search-controls" class="search-controls" style="display: none;">
+                <input type="text" id="search-input" placeholder="本を検索..." class="search-input">
+                <select id="author-filter" class="author-filter">
+                    <option value="">すべての著者</option>
+                </select>
+                <button id="add-book-btn" class="add-book-button">新規追加</button>
+            </div>
+            
+            <div id="book-list"></div>
+        </section>
+
+        <!-- SC2: 詳細画面 -->
+        <section id="screen-detail" class="screen" style="display: none;">
+            <button id="back-btn" class="back-button">← 戻る</button>
+            <div id="book-detail-content">
+                <!-- ここに本の詳細が動的に表示されます -->
+            </div>
+        </section>
+
+        <!-- SC3: 追加・編集画面（管理モード時のみ表示） -->
+        <section id="screen-edit" class="screen" style="display: none;">
+            <button id="back-edit-btn" class="back-button">← 一覧に戻る</button>
+            <div id="book-edit-content">
+                <!-- ここに本の追加・編集フォームが動的に表示されます -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 認証モーダル -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>管理モード認証</h2>
+                <button id="close-auth-modal-x" class="close-x">×</button>
+            </div>
+            <div class="auth-form">
+                <input type="email" id="auth-email" placeholder="メールアドレス" class="auth-input">
+                <input type="password" id="auth-password" placeholder="パスワード" class="auth-input">
+                <button id="auth-login-btn" class="auth-button">ログイン</button>
+            </div>
+            <div class="modal-buttons">
+                <button id="close-auth-modal-btn" class="close-button">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- プロンプト表示モーダル -->
+    <div id="prompt-modal" class="modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>上司と対話するプロンプト</h2>
+                <button id="close-modal-x" class="close-x">×</button>
+            </div>
+            <textarea id="prompt-text" class="prompt-textarea" readonly></textarea>
+            <div class="modal-buttons">
+                <button id="copy-btn" class="copy-button">📋 コピー</button>
+                <button id="close-modal-btn" class="close-button">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- コピー成功モーダル -->
+    <div id="copy-success-modal" class="modal copy-success-modal" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content copy-success-content">
+            <div class="modal-header copy-success-header">
+                <h2>✨ コピー完了</h2>
+                <button id="close-copy-success-x" class="close-x">×</button>
+            </div>
+            <div class="copy-success-message">
+                <p>コピーしました。AIに読み込ませて対話しましょう</p>
+            </div>
+            <div class="modal-buttons">
+                <button id="close-copy-success-btn" class="close-button">閉じる</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
