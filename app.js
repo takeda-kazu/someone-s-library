@@ -155,9 +155,10 @@ function createBookCard(book) {
     
     // カードの内容を設定
     card.innerHTML = `
-        <h3 class="book-title">📚 ${book.title}</h3>
-        <p class="book-author">著者: ${book.author}</p>
-        <p class="book-summary">${book.summary}</p>
+        <h3 class="book-title" id="book-title-${book.id}">📚 ${book.title}</h3>
+        <p class="book-author" id="book-author-${book.id}">著者: ${book.author}</p>
+        <p class="book-summary" id="book-summary-${book.id}">${book.summary}</p>
+        <button class="prompt-button" id="prompt-btn-${book.id}" data-book-id="${book.id}">💬 上司と対話するプロンプト</button>
         ${adminButtons}
     `;
     
@@ -167,6 +168,19 @@ function createBookCard(book) {
             console.log('[click] book card, bookId:', book.id);
             selectedBookId = book.id;
             showBookDetail(book.id);
+        });
+    }
+    
+    // プロンプトボタンのイベントリスナー
+    const promptBtn = card.querySelector('.prompt-button');
+    if (promptBtn) {
+        promptBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            console.log('[click] prompt button, bookId:', book.id);
+            const bookId = this.dataset.bookId;
+            const prompt = generatePrompt(bookId);
+            console.log('[prompt] generated for bookId:', bookId);
+            openModal(prompt);
         });
     }
     

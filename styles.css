@@ -61,6 +61,32 @@ header h1 {
     margin-bottom: var(--spacing-md);
 }
 
+/* プロンプトボタンのスタイル */
+.prompt-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    width: 100%;
+}
+
+.prompt-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.prompt-button:active {
+    transform: translateY(0);
+}
+
 /* 管理モードコントロール */
 .admin-controls {
     display: flex;
@@ -600,10 +626,20 @@ header h1 {
 @media (max-width: 768px) {
     header {
         padding: var(--spacing-lg) var(--spacing-md);
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-md);
     }
     
     header h1 {
         font-size: 24px;
+        text-align: center;
+        margin-bottom: 0;
+    }
+    
+    .admin-controls {
+        margin-top: 0;
+        justify-content: center;
     }
     
     #app {
@@ -617,10 +653,37 @@ header h1 {
     
     .book-title {
         font-size: 20px;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .book-author {
+        font-size: 14px;
+        margin-bottom: var(--spacing-sm);
     }
     
     .book-summary {
-        -webkit-line-clamp: 2;
+        -webkit-line-clamp: 3;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .prompt-button {
+        font-size: 13px;
+        padding: 10px 16px;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .book-card-actions {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        margin-top: var(--spacing-md);
+    }
+    
+    .book-action-btn {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px;
     }
     
     .detail-title {
@@ -630,6 +693,26 @@ header h1 {
     .modal-content {
         padding: var(--spacing-lg);
         margin: var(--spacing-md);
+        max-width: calc(100vw - 32px);
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+    }
+    
+    .search-controls {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: stretch;
+    }
+    
+    .search-input, .author-filter {
+        width: 100%;
+        font-size: 16px; /* iOS Safariのズーム防止 */
+    }
+    
+    .add-book-button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
     }
 }
 

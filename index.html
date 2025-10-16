@@ -42,12 +42,12 @@
 </head>
 <body>
     <!-- ヘッダー: アプリのタイトル -->
-    <header>
-        <h1>●●の本棚</h1>
+    <header id="app-header" name="アプリヘッダー">
+        <h1 id="app-title" name="アプリタイトル">●●の本棚</h1>
         <!-- 管理モード切り替えボタン -->
-        <div class="admin-controls">
-            <button id="admin-mode-btn" class="admin-button">管理モード</button>
-            <button id="normal-mode-btn" class="admin-button" style="display: none;">通常モードに戻る</button>
+        <div class="admin-controls" id="admin-controls" name="管理モードコントロール">
+            <button id="admin-mode-btn" class="admin-button" name="管理モードボタン">管理モード</button>
+            <button id="normal-mode-btn" class="admin-button" style="display: none;" name="通常モードボタン">通常モードに戻る</button>
         </div>
     </header>
 
@@ -56,12 +56,12 @@
         <!-- SC1: 一覧画面 -->
         <section id="screen-list" class="screen">
             <!-- 検索・フィルター機能（管理モード時のみ表示） -->
-            <div id="search-controls" class="search-controls" style="display: none;">
-                <input type="text" id="search-input" placeholder="本を検索..." class="search-input">
-                <select id="author-filter" class="author-filter">
+            <div id="search-controls" class="search-controls" style="display: none;" name="検索コントロール">
+                <input type="text" id="search-input" placeholder="本を検索..." class="search-input" name="検索入力">
+                <select id="author-filter" class="author-filter" name="著者フィルター">
                     <option value="">すべての著者</option>
                 </select>
-                <button id="add-book-btn" class="add-book-button">新規追加</button>
+                <button id="add-book-btn" class="add-book-button" name="新規追加ボタン">新規追加</button>
             </div>
             
             <div id="book-list"></div>
