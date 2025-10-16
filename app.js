@@ -23,6 +23,18 @@ document.addEventListener('DOMContentLoaded', function() {
             await migrateInitialDataToFirebase();
         }
         
+        // window.booksDataのIDを数値型に統一
+        if (window.booksData && window.booksData.length > 0) {
+            window.booksData.forEach((book, index) => {
+                if (typeof book.id === 'string') {
+                    book.id = parseInt(book.id) || (index + 1);
+                } else if (book.id === undefined || book.id === null) {
+                    book.id = index + 1;
+                }
+            });
+            console.log('[data] normalized book IDs');
+        }
+        
         // 本の一覧を表示
         displayBookList();
         
