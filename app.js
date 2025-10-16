@@ -307,7 +307,8 @@ function showBookDetail(bookId) {
 // プロンプトを自動生成する関数
 function generatePrompt(bookId) {
     // 本のデータを取得
-    const book = booksData.find(b => b.id === bookId);
+    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
+    const book = currentData.find(b => b.id === bookId);
     
     if (!book) {
         console.error('[error] book not found for prompt generation, bookId:', bookId);
