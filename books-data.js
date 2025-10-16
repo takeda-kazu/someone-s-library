@@ -155,3 +155,6 @@ const booksData = [
 
 console.log('[data] loaded', booksData.length, 'books');
 
+// グローバル変数として設定
+window.booksData = booksData;
+
