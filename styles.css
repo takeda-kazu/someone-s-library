@@ -37,14 +37,33 @@ body {
 
 /* ヘッダーのスタイル */
 header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
+    background: 
+        linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)),
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300"><rect fill="%23f8f4e6" width="1200" height="300"/><g transform="translate(600,150)"><rect x="-400" y="-100" width="800" height="200" fill="%23d4c4a8" rx="10"/><rect x="-350" y="-80" width="700" height="160" fill="%23f5f0e1" rx="5"/><rect x="-300" y="-60" width="600" height="120" fill="%23e8e2d1" rx="3"/><text x="-50" y="10" font-family="serif" font-size="20" fill="%23666">知識の扉</text></g><text x="50" y="50" font-family="serif" font-size="16" fill="%23888">魔法のような学習体験</text></svg>');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    backdrop-filter: blur(10px);
     padding: var(--spacing-xl) var(--spacing-lg);
     border-bottom: 1px solid var(--color-border);
     box-shadow: 0 8px 32px rgba(0, 124, 186, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ヘッダーコンテンツのコンテナ */
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    max-width: 800px;
+    width: 100%;
 }
 
 /* ヘッダー内のタイトル（h1） */
@@ -58,7 +77,8 @@ header h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: var(--spacing-md);
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* プロンプトボタンのスタイル */
@@ -90,28 +110,30 @@ header h1 {
 /* 管理モードコントロール */
 .admin-controls {
     display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-md);
+    gap: var(--spacing-sm);
+    margin: 0;
 }
 
 .admin-button {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-    border: none;
-    color: white;
-    font-size: 14px;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--color-primary);
+    font-size: 12px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 600;
+    transition: all 0.3s ease;
+    font-weight: 500;
     letter-spacing: 0.02em;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .admin-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .admin-button:active {
@@ -626,20 +648,29 @@ header h1 {
 @media (max-width: 768px) {
     header {
         padding: var(--spacing-lg) var(--spacing-md);
+        min-height: 150px;
+        background-attachment: scroll;
+    }
+    
+    .header-content {
         flex-direction: column;
-        align-items: center;
         gap: var(--spacing-md);
+        text-align: center;
     }
     
     header h1 {
         font-size: 24px;
-        text-align: center;
-        margin-bottom: 0;
+        margin: 0;
     }
     
     .admin-controls {
-        margin-top: 0;
+        margin: 0;
         justify-content: center;
+    }
+    
+    .admin-button {
+        font-size: 11px;
+        padding: 6px 12px;
     }
     
     #app {
