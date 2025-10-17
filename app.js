@@ -125,24 +125,24 @@ function setupEventListeners() {
 function displayBookList() {
     // book-listコンテナを取得
     const bookListContainer = document.getElementById('book-list');
-    
+
     if (!bookListContainer) {
         console.error('[error] book-list container not found');
         return;
     }
-    
+
     // 既存のコンテンツをクリア
     bookListContainer.innerHTML = '';
-    
-    // データが空の場合は初期データを表示
-    const dataToDisplay = window.booksData || [];
-    
+
+    // Firebaseのデータを優先、なければローカルデータを表示
+    const dataToDisplay = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
+
     // 各本のカードを作成
     dataToDisplay.forEach(book => {
         const card = createBookCard(book);
         bookListContainer.appendChild(card);
     });
-    
+
     console.log('[data] displayed', dataToDisplay.length, 'books');
 }
 
@@ -256,8 +256,13 @@ function showScreen(screenName) {
 function showBookDetail(bookId) {
     // 本のデータを取得
     const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
-    const book = currentData.find(b => b.id === bookId);
-    
+    // IDの型が異なる可能性があるため、緩い比較を使用
+    const book = currentData.find(b => b.id == bookId);
+
+    console.log('[debug] showBookDetail called with bookId:', bookId, typeof bookId);
+    console.log('[debug] currentData:', currentData.map(b => ({ id: b.id, type: typeof b.id })));
+    console.log('[debug] found book:', book);
+
     if (!book) {
         console.error('[error] book not found, bookId:', bookId);
         return;
@@ -341,14 +346,12 @@ function showBookDetail(bookId) {
 
 // プロンプトを自動生成する関数
 function generatePrompt(bookId) {
-    // 本のデータを取得
-    const currentData = window.booksData || [];
-    // bookIdを数値に変換してから検索
-    const numericBookId = parseInt(bookId);
-    const book = currentData.find(b => b.id === numericBookId);
-    
+    // 本のデータを取得（Firebaseデータを優先）
+    const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
+    // bookIdで検索（文字列と数値の両方に対応）
+    const book = currentData.find(b => b.id == bookId);
+
     console.log('[debug] generatePrompt called with bookId:', bookId, typeof bookId);
-    console.log('[debug] converted to numericBookId:', numericBookId, typeof numericBookId);
     console.log('[debug] currentData length:', currentData.length);
     console.log('[debug] found book:', book);
     
@@ -819,16 +822,20 @@ function showAddBookForm() {
 // 本を編集するフォームを表示
 function editBook(bookId) {
     console.log('[action] edit book:', bookId);
-    
+
     // 本のデータを取得
     const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
-    const book = currentData.find(b => b.id === bookId);
-    
+    // IDの型が異なる可能性があるため、緩い比較を使用
+    const book = currentData.find(b => b.id == bookId);
+
+    console.log('[debug] editBook - currentData:', currentData.map(b => ({ id: b.id, type: typeof b.id })));
+    console.log('[debug] editBook - found book:', book);
+
     if (!book) {
         console.error('[error] book not found:', bookId);
         return;
     }
-    
+
     showBookEditForm(book);
 }
 
