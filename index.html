@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>library_watch</title>
+    <meta name="description" content="個人の本棚管理システム - 読書記録と感想を保存・共有">
+    <meta name="theme-color" content="#007cba">
+    <title>本棚 - Library Watch</title>
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- Firebase SDK -->
     <script type="module">
         // Import the functions you need from the SDKs you need
@@ -33,53 +35,102 @@
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
-        
+
         console.log('Firebase initialized successfully');
     </script>
-    
+
     <script src="books-data.js"></script>
     <script src="app.js"></script>
 </head>
 <body>
-    <!-- ヘッダー: アプリのタイトル -->
-    <header id="app-header" name="アプリヘッダー">
+    <!-- Skip to main content link for keyboard navigation accessibility -->
+    <a href="#main-content" class="skip-link">メインコンテンツへスキップ</a>
+
+    <!-- ヘッダー: アプリのタイトルとナビゲーション -->
+    <header id="app-header" role="banner">
         <div class="header-content">
-            <h1 id="app-title" name="アプリタイトル">●●の本棚</h1>
+            <h1 id="app-title">
+                <span class="visually-hidden">私の</span>
+                本棚
+            </h1>
             <!-- 管理モード切り替えボタン -->
-            <div class="admin-controls" id="admin-controls" name="管理モードコントロール">
-                <button id="admin-mode-btn" class="admin-button" name="管理モードボタン">管理</button>
-                <button id="normal-mode-btn" class="admin-button" style="display: none;" name="通常モードボタン">通常</button>
-            </div>
+            <nav class="admin-controls" aria-label="管理モード切り替え">
+                <button
+                    id="admin-mode-btn"
+                    class="admin-button"
+                    aria-label="管理モードに切り替え"
+                    type="button">
+                    管理
+                </button>
+                <button
+                    id="normal-mode-btn"
+                    class="admin-button"
+                    style="display: none;"
+                    aria-label="通常モードに切り替え"
+                    type="button">
+                    通常
+                </button>
+            </nav>
         </div>
     </header>
 
     <!-- メインコンテナ -->
-    <main id="app">
+    <main id="main-content" role="main">
         <!-- SC1: 一覧画面 -->
-        <section id="screen-list" class="screen">
+        <section id="screen-list" class="screen" aria-labelledby="book-list-heading">
+            <h2 id="book-list-heading" class="visually-hidden">本の一覧</h2>
+
             <!-- 検索・フィルター機能（管理モード時のみ表示） -->
-            <div id="search-controls" class="search-controls" style="display: none;" name="検索コントロール">
-                <input type="text" id="search-input" placeholder="本を検索..." class="search-input" name="検索入力">
-                <select id="author-filter" class="author-filter" name="著者フィルター">
+            <div id="search-controls" class="search-controls" style="display: none;" role="search" aria-label="本を検索">
+                <label for="search-input" class="visually-hidden">本を検索</label>
+                <input
+                    type="search"
+                    id="search-input"
+                    placeholder="本を検索..."
+                    class="search-input"
+                    aria-describedby="search-hint">
+                <span id="search-hint" class="visually-hidden">タイトルまたは著者名で検索できます</span>
+
+                <label for="author-filter" class="visually-hidden">著者で絞り込み</label>
+                <select id="author-filter" class="author-filter" aria-label="著者で絞り込み">
                     <option value="">すべての著者</option>
                 </select>
-                <button id="add-book-btn" class="add-book-button" name="新規追加ボタン">新規追加</button>
+
+                <button
+                    id="add-book-btn"
+                    class="add-book-button"
+                    type="button"
+                    aria-label="新しい本を追加">
+                    <span aria-hidden="true">+</span> 新規追加
+                </button>
             </div>
-            
-            <div id="book-list"></div>
+
+            <div id="book-list" role="list" aria-live="polite" aria-atomic="false"></div>
         </section>
 
         <!-- SC2: 詳細画面 -->
-        <section id="screen-detail" class="screen" style="display: none;">
-            <button id="back-btn" class="back-button">← 戻る</button>
-            <div id="book-detail-content">
+        <section id="screen-detail" class="screen" style="display: none;" aria-labelledby="detail-heading">
+            <button
+                id="back-btn"
+                class="back-button"
+                type="button"
+                aria-label="一覧に戻る">
+                <span aria-hidden="true">←</span> 戻る
+            </button>
+            <div id="book-detail-content" role="article">
                 <!-- ここに本の詳細が動的に表示されます -->
             </div>
         </section>
 
         <!-- SC3: 追加・編集画面（管理モード時のみ表示） -->
-        <section id="screen-edit" class="screen" style="display: none;">
-            <button id="back-edit-btn" class="back-button">← 一覧に戻る</button>
+        <section id="screen-edit" class="screen" style="display: none;" aria-labelledby="edit-heading">
+            <button
+                id="back-edit-btn"
+                class="back-button"
+                type="button"
+                aria-label="一覧に戻る">
+                <span aria-hidden="true">←</span> 一覧に戻る
+            </button>
             <div id="book-edit-content">
                 <!-- ここに本の追加・編集フォームが動的に表示されます -->
             </div>
@@ -87,55 +138,148 @@
     </main>
 
     <!-- 認証モーダル -->
-    <div id="auth-modal" class="modal" style="display: none;">
-        <div class="modal-overlay"></div>
+    <div
+        id="auth-modal"
+        class="modal"
+        style="display: none;"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title">
+        <div class="modal-overlay" aria-hidden="true"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>管理モード認証</h2>
-                <button id="close-auth-modal-x" class="close-x">×</button>
+                <h2 id="auth-modal-title">管理モード認証</h2>
+                <button
+                    id="close-auth-modal-x"
+                    class="close-x"
+                    type="button"
+                    aria-label="認証モーダルを閉じる">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-            <div class="auth-form">
-                <input type="email" id="auth-email" placeholder="メールアドレス" class="auth-input">
-                <input type="password" id="auth-password" placeholder="パスワード" class="auth-input">
-                <button id="auth-login-btn" class="auth-button">ログイン</button>
-            </div>
+            <form class="auth-form" onsubmit="return false;">
+                <label for="auth-email" class="visually-hidden">メールアドレス</label>
+                <input
+                    type="email"
+                    id="auth-email"
+                    placeholder="メールアドレス"
+                    class="auth-input"
+                    required
+                    autocomplete="email"
+                    aria-required="true">
+
+                <label for="auth-password" class="visually-hidden">パスワード</label>
+                <input
+                    type="password"
+                    id="auth-password"
+                    placeholder="パスワード"
+                    class="auth-input"
+                    required
+                    autocomplete="current-password"
+                    aria-required="true">
+
+                <button
+                    id="auth-login-btn"
+                    class="auth-button"
+                    type="submit"
+                    aria-label="ログイン">
+                    ログイン
+                </button>
+            </form>
             <div class="modal-buttons">
-                <button id="close-auth-modal-btn" class="close-button">キャンセル</button>
+                <button
+                    id="close-auth-modal-btn"
+                    class="close-button"
+                    type="button">
+                    キャンセル
+                </button>
             </div>
         </div>
     </div>
 
     <!-- プロンプト表示モーダル -->
-    <div id="prompt-modal" class="modal" style="display: none;">
-        <div class="modal-overlay"></div>
+    <div
+        id="prompt-modal"
+        class="modal"
+        style="display: none;"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prompt-modal-title">
+        <div class="modal-overlay" aria-hidden="true"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h2>上司と対話するプロンプト</h2>
-                <button id="close-modal-x" class="close-x">×</button>
+                <h2 id="prompt-modal-title">上司と対話するプロンプト</h2>
+                <button
+                    id="close-modal-x"
+                    class="close-x"
+                    type="button"
+                    aria-label="プロンプトモーダルを閉じる">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-            <textarea id="prompt-text" class="prompt-textarea" readonly></textarea>
+            <label for="prompt-text" class="visually-hidden">プロンプトテキスト</label>
+            <textarea
+                id="prompt-text"
+                class="prompt-textarea"
+                readonly
+                aria-label="生成されたプロンプトテキスト"
+                aria-describedby="prompt-description"></textarea>
+            <p id="prompt-description" class="visually-hidden">このテキストをコピーしてAIチャットで使用できます</p>
             <div class="modal-buttons">
-                <button id="copy-btn" class="copy-button">📋 コピー</button>
-                <button id="close-modal-btn" class="close-button">閉じる</button>
+                <button
+                    id="copy-btn"
+                    class="copy-button"
+                    type="button"
+                    aria-label="プロンプトをクリップボードにコピー">
+                    <span aria-hidden="true">📋</span> コピー
+                </button>
+                <button
+                    id="close-modal-btn"
+                    class="close-button"
+                    type="button">
+                    閉じる
+                </button>
             </div>
         </div>
     </div>
 
     <!-- コピー成功モーダル -->
-    <div id="copy-success-modal" class="modal copy-success-modal" style="display: none;">
-        <div class="modal-overlay"></div>
+    <div
+        id="copy-success-modal"
+        class="modal copy-success-modal"
+        style="display: none;"
+        role="alert"
+        aria-live="assertive"
+        aria-labelledby="copy-success-title">
+        <div class="modal-overlay" aria-hidden="true"></div>
         <div class="modal-content copy-success-content">
             <div class="modal-header copy-success-header">
-                <h2>✨ コピー完了</h2>
-                <button id="close-copy-success-x" class="close-x">×</button>
+                <h2 id="copy-success-title">
+                    <span aria-hidden="true">✨</span> コピー完了
+                </h2>
+                <button
+                    id="close-copy-success-x"
+                    class="close-x"
+                    type="button"
+                    aria-label="通知を閉じる">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
             <div class="copy-success-message">
                 <p>コピーしました。AIに読み込ませて対話しましょう</p>
             </div>
             <div class="modal-buttons">
-                <button id="close-copy-success-btn" class="close-button">閉じる</button>
+                <button
+                    id="close-copy-success-btn"
+                    class="close-button"
+                    type="button">
+                    閉じる
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Status messages for screen reader announcements -->
+    <div role="status" aria-live="polite" aria-atomic="true" class="visually-hidden" id="status-message"></div>
 </body>
 </html>
