@@ -365,7 +365,7 @@ header h1 {
 /* 表紙画像コンテナ */
 .book-cover {
     width: 100%;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 2 / 3;
     overflow: hidden;
     background: linear-gradient(135deg, #f0f4f8 0%, #d9e8f5 100%);
     position: relative;
@@ -397,7 +397,7 @@ header h1 {
 }
 
 .book-icon {
-    font-size: 48px;
+    font-size: 36px;
     margin-bottom: var(--spacing-sm);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
@@ -522,9 +522,9 @@ header h1 {
 /* 詳細画面の表紙画像 */
 .detail-cover-image {
     width: 100%;
-    max-width: 400px;
+    max-width: 280px;
     margin: 0 auto var(--spacing-xl) auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 2 / 3;
     overflow: hidden;
     border-radius: var(--radius-md);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -546,11 +546,11 @@ header h1 {
 }
 
 .detail-cover-image .book-icon {
-    font-size: 80px;
+    font-size: 64px;
 }
 
 .detail-cover-image .no-image-text {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* 戻るボタン */
@@ -910,11 +910,11 @@ header h1 {
     }
 
     .book-cover {
-        aspect-ratio: 3 / 4;
+        aspect-ratio: 2 / 3;
     }
 
     .book-icon {
-        font-size: 32px;
+        font-size: 28px;
     }
 
     .no-image-text {
@@ -935,6 +935,14 @@ header h1 {
     
     .detail-title {
         font-size: 24px;
+    }
+
+    .detail-cover-image {
+        max-width: 220px;
+    }
+
+    .detail-cover-image .book-icon {
+        font-size: 48px;
     }
     
     .modal-content {

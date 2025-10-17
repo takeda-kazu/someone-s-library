@@ -317,8 +317,24 @@ function showBookDetail(bookId) {
         </div>
 
         ${quotesHTML}
+
+        <button id="dialog-btn" class="dialog-button">🤖 上司と対話するプロンプト</button>
     `;
-    
+
+    // 「上司と対話」ボタンのイベントリスナーを設定
+    setTimeout(() => {
+        const dialogBtn = document.getElementById('dialog-btn');
+        if (dialogBtn) {
+            dialogBtn.addEventListener('click', function() {
+                console.log('[click] dialog button');
+                const prompt = generatePrompt(bookId);
+                console.log('[prompt] generated for bookId:', bookId);
+                // プロンプトをモーダルで表示
+                openModal(prompt);
+            });
+        }
+    }, 0);
+
     // 詳細画面に切り替え
     showScreen('detail');
 }
