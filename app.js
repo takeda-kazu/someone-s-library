@@ -1124,7 +1124,8 @@ async function updateBookInFirebase(bookData) {
     const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
 
     // 基本情報と引用文を更新
-    const bookRef = doc(window.firebaseDb, 'books', bookData.id);
+    // bookData.idを文字列に変換
+    const bookRef = doc(window.firebaseDb, 'books', String(bookData.id));
     await updateDoc(bookRef, {
         title: bookData.title,
         author: bookData.author,
@@ -1139,9 +1140,10 @@ async function updateBookInFirebase(bookData) {
 // 本をFirebaseから削除
 async function deleteBookFromFirebase(bookId) {
     const { doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-    
+
     // 本を削除（引用文も一緒に削除される）
-    const bookRef = doc(window.firebaseDb, 'books', bookId);
+    // bookIdを文字列に変換
+    const bookRef = doc(window.firebaseDb, 'books', String(bookId));
     await deleteDoc(bookRef);
 }
 
