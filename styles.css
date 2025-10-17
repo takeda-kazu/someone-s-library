@@ -432,35 +432,35 @@ header h1 {
 
 /* 本のタイトル */
 .book-title {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     letter-spacing: 0.01em;
-    line-height: 1.3;
+    line-height: 1.4;
 }
 
 /* 著者名 */
 .book-author {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
     font-weight: 500;
     letter-spacing: 0.01em;
 }
 
 /* 感想要約 */
 .book-summary {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--color-text-secondary);
-    line-height: 1.6;
+    line-height: 1.7;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 400;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 /* SC2: 詳細画面 */
@@ -809,30 +809,31 @@ header h1 {
     }
 
     .book-card {
-        padding: var(--spacing-lg);
+        padding: var(--spacing-md);
     }
-    
+
     .book-title {
-        font-size: 20px;
-        margin-bottom: var(--spacing-sm);
-    }
-    
-    .book-author {
         font-size: 14px;
-        margin-bottom: var(--spacing-sm);
+        margin-bottom: 6px;
+        line-height: 1.3;
     }
-    
+
+    .book-author {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
     .book-summary {
         -webkit-line-clamp: 3;
-        font-size: 14px;
-        line-height: 1.5;
-        margin-bottom: var(--spacing-md);
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: var(--spacing-sm);
     }
     
     .prompt-button {
-        font-size: 13px;
-        padding: 10px 16px;
-        margin-top: var(--spacing-sm);
+        font-size: 11px;
+        padding: 6px 10px;
+        margin-top: 6px;
     }
     
     .book-card-actions {
