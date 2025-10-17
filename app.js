@@ -152,7 +152,7 @@ function createBookCard(book) {
     const card = document.createElement('div');
     card.className = 'book-card';
     card.dataset.bookId = book.id;
-    
+
     // 管理モードの場合は編集・削除ボタンを追加
     let adminButtons = '';
     if (isAdminMode && currentUser) {
@@ -164,43 +164,47 @@ function createBookCard(book) {
             </div>
         `;
     }
-    
-    // カードの内容を設定
+
+    // 表紙画像の表示
+    let coverImageHTML = '';
+    if (book.coverImageUrl && book.coverImageUrl.trim() !== '') {
+        coverImageHTML = `<img src="${book.coverImageUrl}" alt="${book.title}" class="book-cover-image" onerror="this.parentElement.querySelector('.no-cover-placeholder').style.display='flex'; this.style.display='none';">`;
+    }
+
+    // 画像なしの場合のプレースホルダー
+    const placeholderStyle = (book.coverImageUrl && book.coverImageUrl.trim() !== '') ? 'style="display: none;"' : '';
+
+    // カードの内容を設定（本屋さん風レイアウト）
     card.innerHTML = `
-        <h3 class="book-title" id="book-title-${book.id}">📚 ${book.title}</h3>
-        <p class="book-author" id="book-author-${book.id}">著者: ${book.author}</p>
-        <p class="book-summary" id="book-summary-${book.id}">${book.summary}</p>
-        <button class="prompt-button" id="prompt-btn-${book.id}" data-book-id="${book.id}">💬 上司と対話するプロンプト</button>
+        <div class="book-cover">
+            ${coverImageHTML}
+            <div class="no-cover-placeholder" ${placeholderStyle}>
+                <span class="book-icon">📚</span>
+                <span class="no-image-text">画像なし</span>
+            </div>
+        </div>
+        <div class="book-info">
+            <h3 class="book-title" id="book-title-${book.id}">${book.title}</h3>
+            <p class="book-author" id="book-author-${book.id}">${book.author}</p>
+        </div>
         ${adminButtons}
     `;
-    
-    // カードクリック時のイベントリスナー（管理モードでない場合のみ）
-    if (!isAdminMode || !currentUser) {
-        card.addEventListener('click', function() {
+
+    // カードクリック時のイベントリスナー
+    card.addEventListener('click', function(e) {
+        // 管理ボタンのクリックでない場合のみ詳細画面に遷移
+        if (!e.target.classList.contains('book-action-btn')) {
             console.log('[click] book card, bookId:', book.id);
             selectedBookId = book.id;
             showBookDetail(book.id);
-        });
-    }
-    
-    // プロンプトボタンのイベントリスナー
-    const promptBtn = card.querySelector('.prompt-button');
-    if (promptBtn) {
-        promptBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            console.log('[click] prompt button, bookId:', book.id);
-            const bookId = this.dataset.bookId;
-            const prompt = generatePrompt(bookId);
-            console.log('[prompt] generated for bookId:', bookId);
-            openModal(prompt);
-        });
-    }
-    
+        }
+    });
+
     // 管理ボタンのイベントリスナー
     if (isAdminMode && currentUser) {
         const editBtn = card.querySelector('.edit');
         const deleteBtn = card.querySelector('.delete');
-        
+
         if (editBtn) {
             editBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -208,7 +212,7 @@ function createBookCard(book) {
                 editBook(book.id);
             });
         }
-        
+
         if (deleteBtn) {
             deleteBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
@@ -217,7 +221,7 @@ function createBookCard(book) {
             });
         }
     }
-    
+
     return card;
 }
 
@@ -279,38 +283,41 @@ function showBookDetail(bookId) {
         `).join('');
     }
     
+    // 表紙画像の表示
+    let coverImageHTML = '';
+    if (book.coverImageUrl && book.coverImageUrl.trim() !== '') {
+        coverImageHTML = `
+            <div class="detail-cover-image">
+                <img src="${book.coverImageUrl}" alt="${book.title}" onerror="this.parentElement.innerHTML='<div class=\\'no-cover-placeholder\\'><span class=\\'book-icon\\'>📚</span><span class=\\'no-image-text\\'>画像なし</span></div>'">
+            </div>
+        `;
+    } else {
+        coverImageHTML = `
+            <div class="detail-cover-image">
+                <div class="no-cover-placeholder">
+                    <span class="book-icon">📚</span>
+                    <span class="no-image-text">画像なし</span>
+                </div>
+            </div>
+        `;
+    }
+
     // 詳細画面の内容を設定
     detailContent.innerHTML = `
+        ${coverImageHTML}
         <div class="book-detail-info">
-            <h2 class="detail-title">📖 ${book.title}</h2>
+            <h2 class="detail-title">${book.title}</h2>
             <p class="detail-author">著者: ${book.author}</p>
             <p class="detail-summary">あらすじ: ${book.summary}</p>
         </div>
-        
+
         <div class="overall-review-section">
             <h3 class="section-title">全体の感想</h3>
             <div class="overall-review-content">${book.overallReview}</div>
         </div>
-        
+
         ${quotesHTML}
-        
-        <button id="dialog-btn" class="dialog-button">🤖 上司と対話</button>
     `;
-    
-    // 「上司と対話」ボタンのイベントリスナーを設定
-    // setTimeout で次のイベントループでイベントを設定（DOM追加後に実行）
-    setTimeout(() => {
-        const dialogBtn = document.getElementById('dialog-btn');
-        if (dialogBtn) {
-            dialogBtn.addEventListener('click', function() {
-                console.log('[click] dialog button');
-                const prompt = generatePrompt(bookId);
-                console.log('[prompt] generated for bookId:', bookId);
-                // プロンプトをモーダルで表示
-                openModal(prompt);
-            });
-        }
-    }, 0);
     
     // 詳細画面に切り替え
     showScreen('detail');
@@ -835,7 +842,7 @@ function showBookEditForm(book) {
     editContent.innerHTML = `
         <div class="edit-form">
             <h2>${formTitle}</h2>
-            
+
             <form id="book-form">
                 <div class="form-section">
                     <h3>基本情報</h3>
@@ -843,6 +850,16 @@ function showBookEditForm(book) {
                     <input type="text" name="author" placeholder="著者" value="${isEditMode ? book.author : ''}" class="form-input" required>
                     <textarea name="summary" placeholder="あらすじ" class="form-textarea" required>${isEditMode ? book.summary : ''}</textarea>
                     <textarea name="overallReview" placeholder="全体の感想" class="form-textarea" required>${isEditMode ? book.overallReview : ''}</textarea>
+                </div>
+
+                <div class="form-section">
+                    <h3>表紙画像</h3>
+                    <input type="url" name="coverImageUrl" id="cover-image-url" placeholder="表紙画像URL (例: https://m.media-amazon.com/images/I/...)" value="${isEditMode && book.coverImageUrl ? book.coverImageUrl : ''}" class="form-input">
+                    <div class="image-preview-container">
+                        <div id="image-preview" class="image-preview">
+                            ${isEditMode && book.coverImageUrl ? `<img src="${book.coverImageUrl}" alt="表紙プレビュー" onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>画像を読み込めません</div>'">` : '<div class="no-image-placeholder">📚<br>画像URLを入力すると<br>プレビューが表示されます</div>'}
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="form-section">
@@ -871,7 +888,7 @@ function showBookEditForm(book) {
 // 編集フォームのイベントリスナーを設定
 function setupEditFormEventListeners(book) {
     const isEditMode = book !== null;
-    
+
     // フォーム送信
     const bookForm = document.getElementById('book-form');
     if (bookForm) {
@@ -881,7 +898,7 @@ function setupEditFormEventListeners(book) {
             handleSaveBook(book);
         });
     }
-    
+
     // キャンセルボタン
     const cancelBtn = document.getElementById('cancel-edit-btn');
     if (cancelBtn) {
@@ -890,7 +907,7 @@ function setupEditFormEventListeners(book) {
             showScreen('list');
         });
     }
-    
+
     // 引用文追加ボタン
     const addQuoteBtn = document.getElementById('add-quote-btn');
     if (addQuoteBtn) {
@@ -899,7 +916,7 @@ function setupEditFormEventListeners(book) {
             addQuoteField();
         });
     }
-    
+
     // 引用文削除ボタン
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-quote-btn')) {
@@ -907,6 +924,28 @@ function setupEditFormEventListeners(book) {
             e.target.closest('.quote-section').remove();
         }
     });
+
+    // 表紙画像URLの入力時にプレビューを更新
+    const coverImageUrlInput = document.getElementById('cover-image-url');
+    if (coverImageUrlInput) {
+        coverImageUrlInput.addEventListener('input', function() {
+            updateImagePreview(this.value);
+        });
+    }
+}
+
+// 画像プレビューを更新する関数
+function updateImagePreview(url) {
+    const imagePreview = document.getElementById('image-preview');
+    if (!imagePreview) return;
+
+    if (url && url.trim() !== '') {
+        // URLが入力されている場合は画像を表示
+        imagePreview.innerHTML = `<img src="${url}" alt="表紙プレビュー" onerror="this.parentElement.innerHTML='<div class=\\'image-error\\'>画像を読み込めません</div>'">`;
+    } else {
+        // URLが空の場合はプレースホルダーを表示
+        imagePreview.innerHTML = '<div class="no-image-placeholder">📚<br>画像URLを入力すると<br>プレビューが表示されます</div>';
+    }
 }
 
 // 引用文フィールドを追加
@@ -933,13 +972,14 @@ function addQuoteField() {
 async function handleSaveBook(originalBook) {
     const form = document.getElementById('book-form');
     if (!form) return;
-    
+
     const formData = new FormData(form);
-    
+
     // 基本情報を取得
     const bookData = {
         title: formData.get('title'),
         author: formData.get('author'),
+        coverImageUrl: formData.get('coverImageUrl') || '',
         summary: formData.get('summary'),
         overallReview: formData.get('overallReview'),
         updatedAt: new Date().toISOString()
@@ -1047,30 +1087,32 @@ async function loadBooksFromFirebase() {
 // 本をFirebaseに追加
 async function addBookToFirebase(bookData) {
     const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-    
+
     // 本の基本情報を保存（引用文も一緒に保存）
     const bookRef = await addDoc(collection(window.firebaseDb, 'books'), {
         title: bookData.title,
         author: bookData.author,
+        coverImageUrl: bookData.coverImageUrl || '',
         summary: bookData.summary,
         overallReview: bookData.overallReview,
         quotes: bookData.quotes || [],
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
     });
-    
+
     return bookRef.id;
 }
 
 // 本をFirebaseで更新
 async function updateBookInFirebase(bookData) {
     const { doc, updateDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-    
+
     // 基本情報と引用文を更新
     const bookRef = doc(window.firebaseDb, 'books', bookData.id);
     await updateDoc(bookRef, {
         title: bookData.title,
         author: bookData.author,
+        coverImageUrl: bookData.coverImageUrl || '',
         summary: bookData.summary,
         overallReview: bookData.overallReview,
         quotes: bookData.quotes || [],
@@ -1091,25 +1133,26 @@ async function deleteBookFromFirebase(bookId) {
 async function migrateInitialDataToFirebase() {
     try {
         console.log('[migration] starting data migration...');
-        
+
         for (const book of window.booksData) {
             const bookData = {
                 title: book.title,
                 author: book.author,
+                coverImageUrl: book.coverImageUrl || '',
                 summary: book.summary,
                 overallReview: book.overallReview,
                 quotes: book.quotes || []
             };
-            
+
             await addBookToFirebase(bookData);
             console.log('[migration] migrated book:', book.title);
         }
-        
+
         // 移行完了後にFirebaseから再読み込み
         await loadBooksFromFirebase();
-        
+
         console.log('[migration] data migration completed');
-        
+
     } catch (error) {
         console.error('[migration] failed:', error);
     }

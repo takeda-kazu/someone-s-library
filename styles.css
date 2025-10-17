@@ -345,13 +345,13 @@ header h1 {
     margin-top: var(--spacing-lg);
 }
 
-/* 本のカード */
+/* 本のカード（本屋さん風） */
 .book-card {
     background: var(--color-bg-card);
     backdrop-filter: blur(10px);
-    padding: var(--spacing-xl);
+    padding: 0;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 20px rgba(0, 124, 186, 0.08);
@@ -362,19 +362,78 @@ header h1 {
     height: 100%;
 }
 
+/* 表紙画像コンテナ */
+.book-cover {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e8f5 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.book-cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.book-card:hover .book-cover-image {
+    transform: scale(1.05);
+}
+
+/* 画像なしプレースホルダー */
+.no-cover-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+}
+
+.book-icon {
+    font-size: 48px;
+    margin-bottom: var(--spacing-sm);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.no-image-text {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+/* 本の情報エリア */
+.book-info {
+    padding: var(--spacing-md);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
 /* 管理モード時の本のカード */
 .book-card.admin-mode {
-    padding-right: 120px; /* ボタン用のスペースを確保 */
+    padding-bottom: 60px;
 }
 
 .book-card-actions {
     position: absolute;
-    top: var(--spacing-lg);
-    right: var(--spacing-lg);
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 0;
     opacity: 0;
     transition: opacity 0.3s ease;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
 }
 
 .book-card:hover .book-card-actions {
@@ -382,28 +441,28 @@ header h1 {
 }
 
 .book-action-btn {
-    background: var(--color-primary);
+    flex: 1;
+    background: transparent;
     border: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     font-size: 12px;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
 }
 
-.book-action-btn:hover {
-    background: #005a8c;
-    transform: translateY(-1px);
+.book-action-btn:last-child {
+    border-right: none;
 }
 
-.book-action-btn.delete {
-    background: #dc3545;
+.book-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .book-action-btn.delete:hover {
-    background: #c82333;
+    background: rgba(220, 53, 69, 0.8);
 }
 
 .book-card::before {
@@ -430,43 +489,68 @@ header h1 {
     transform: scaleX(1);
 }
 
-/* 本のタイトル */
+/* 本のタイトル（一覧画面） */
 .book-title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-sm);
+    margin: 0;
     letter-spacing: 0.01em;
-    line-height: 1.4;
-}
-
-/* 著者名 */
-.book-author {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-sm);
-    font-weight: 500;
-    letter-spacing: 0.01em;
-}
-
-/* 感想要約 */
-.book-summary {
-    font-size: 14px;
-    color: var(--color-text-secondary);
-    line-height: 1.7;
+    line-height: 1.5;
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* 著者名（一覧画面） */
+.book-author {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin: 0;
     font-weight: 400;
-    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.01em;
 }
 
 /* SC2: 詳細画面 */
 #screen-detail {
     max-width: 800px;
     margin: 0 auto;
+}
+
+/* 詳細画面の表紙画像 */
+.detail-cover-image {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto var(--spacing-xl) auto;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #f0f4f8 0%, #d9e8f5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-cover-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.detail-cover-image .no-cover-placeholder {
+    width: 100%;
+    height: 100%;
+}
+
+.detail-cover-image .book-icon {
+    font-size: 80px;
+}
+
+.detail-cover-image .no-image-text {
+    font-size: 16px;
 }
 
 /* 戻るボタン */
@@ -809,31 +893,32 @@ header h1 {
     }
 
     .book-card {
-        padding: var(--spacing-md);
+        padding: 0;
+    }
+
+    .book-info {
+        padding: var(--spacing-sm);
     }
 
     .book-title {
-        font-size: 14px;
-        margin-bottom: 6px;
-        line-height: 1.3;
+        font-size: 13px;
+        -webkit-line-clamp: 2;
     }
 
     .book-author {
-        font-size: 12px;
-        margin-bottom: 6px;
+        font-size: 11px;
     }
 
-    .book-summary {
-        -webkit-line-clamp: 3;
-        font-size: 12px;
-        line-height: 1.6;
-        margin-bottom: var(--spacing-sm);
+    .book-cover {
+        aspect-ratio: 3 / 4;
     }
-    
-    .prompt-button {
-        font-size: 11px;
-        padding: 6px 10px;
-        margin-top: 6px;
+
+    .book-icon {
+        font-size: 32px;
+    }
+
+    .no-image-text {
+        font-size: 10px;
     }
     
     .book-card-actions {
@@ -950,6 +1035,47 @@ header h1 {
 .form-textarea {
     min-height: 100px;
     resize: vertical;
+}
+
+/* 画像プレビューコンテナ */
+.image-preview-container {
+    margin-top: var(--spacing-md);
+}
+
+.image-preview {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto;
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image-placeholder {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.image-error {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: #dc3545;
+    font-size: 14px;
 }
 
 .quote-section {
