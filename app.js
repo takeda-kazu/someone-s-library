@@ -256,11 +256,19 @@ function showScreen(screenName) {
 function showBookDetail(bookId) {
     // 本のデータを取得
     const currentData = firebaseBooksData.length > 0 ? firebaseBooksData : window.booksData || [];
+
+    console.log('[debug] showBookDetail called with bookId:', bookId, typeof bookId);
+    console.log('[debug] firebaseBooksData.length:', firebaseBooksData.length);
+    console.log('[debug] window.booksData?.length:', window.booksData?.length);
+    console.log('[debug] currentData.length:', currentData.length);
+
+    if (currentData.length > 0) {
+        console.log('[debug] currentData IDs:', currentData.map(b => ({ id: b.id, type: typeof b.id, title: b.title })));
+    }
+
     // IDの型が異なる可能性があるため、緩い比較を使用
     const book = currentData.find(b => b.id == bookId);
 
-    console.log('[debug] showBookDetail called with bookId:', bookId, typeof bookId);
-    console.log('[debug] currentData:', currentData.map(b => ({ id: b.id, type: typeof b.id })));
     console.log('[debug] found book:', book);
 
     if (!book) {
@@ -1086,20 +1094,26 @@ async function deleteBook(bookId) {
 async function loadBooksFromFirebase() {
     try {
         const { collection, getDocs, query, orderBy } = await import('https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js');
-        
+
         const booksRef = collection(window.firebaseDb, 'books');
         const q = query(booksRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
-        
+
         firebaseBooksData = [];
         querySnapshot.forEach((doc) => {
             const bookData = doc.data();
             bookData.id = doc.id;
             firebaseBooksData.push(bookData);
         });
-        
+
         console.log('[firebase] loaded', firebaseBooksData.length, 'books');
-        
+        console.log('[firebase] book IDs:', firebaseBooksData.map(b => ({ id: b.id, type: typeof b.id, title: b.title })));
+
+        // Firebaseデータが取得できた場合は、window.booksDataも更新
+        if (firebaseBooksData.length > 0) {
+            window.booksData = firebaseBooksData;
+        }
+
     } catch (error) {
         console.error('[firebase] load failed:', error);
         // Firebase読み込みに失敗した場合は、ローカルデータを使用
