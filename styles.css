@@ -71,20 +71,20 @@ body {
 
 /* ヘッダーのスタイル */
 header {
-    background: 
+    background:
         linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)),
         linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     backdrop-filter: blur(15px);
-    padding: var(--spacing-xl) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
     border-bottom: 1px solid var(--color-border);
     box-shadow: 0 8px 32px rgba(0, 124, 186, 0.1);
     position: sticky;
     top: 0;
     z-index: 100;
-    min-height: 250px;
+    min-height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -190,7 +190,7 @@ header::after {
 /* ヘッダー内のタイトル（h1） */
 header h1 {
     color: #ffffff;
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 700;
     text-align: center;
     letter-spacing: 0.02em;
@@ -264,10 +264,10 @@ header h1 {
 }
 
 /* メインコンテナ */
-#app {
-    max-width: 900px;
+main {
+    max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-xl) var(--spacing-lg);
+    padding: var(--spacing-xl) var(--spacing-xl);
 }
 
 /* 検索・フィルターコントロール */
@@ -340,8 +340,8 @@ header h1 {
 /* 本のカード一覧（グリッドレイアウト） */
 #book-list {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* PC: 3列 */
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* レスポンシブ対応 */
+    gap: var(--spacing-xl);
     margin-top: var(--spacing-lg);
 }
 
@@ -856,9 +856,13 @@ header h1 {
 /* レスポンシブ: スマホ（幅768px未満） */
 @media (max-width: 768px) {
     header {
-        padding: var(--spacing-lg) var(--spacing-md);
-        min-height: 180px;
+        padding: var(--spacing-md);
+        min-height: 100px;
         background-attachment: scroll;
+    }
+
+    main {
+        padding: var(--spacing-lg) var(--spacing-md);
     }
 
     .header-content {
@@ -868,7 +872,7 @@ header h1 {
     }
 
     header h1 {
-        font-size: 28px;
+        font-size: 22px;
         margin: 0;
     }
 
@@ -888,7 +892,7 @@ header h1 {
 
     /* スマホ: 2列表示 */
     #book-list {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: var(--spacing-md);
     }
 
@@ -973,13 +977,13 @@ header h1 {
 
 /* レスポンシブ: タブレット（幅768px以上1024px未満） */
 @media (min-width: 768px) and (max-width: 1024px) {
-    #app {
+    main {
         padding: var(--spacing-xl) var(--spacing-lg);
     }
 
-    /* タブレット: 2列表示 */
+    /* タブレット: 自動調整 */
     #book-list {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     }
 }
 
@@ -1270,8 +1274,13 @@ header h1 {
 
 /* レスポンシブ: デスクトップ（幅1024px以上） */
 @media (min-width: 1024px) {
-    #app {
-        max-width: 900px;
+    main {
+        max-width: 1200px;
+        padding: var(--spacing-xl) var(--spacing-xxl);
+    }
+
+    #book-list {
+        gap: var(--spacing-xl);
     }
 }
 
