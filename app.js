@@ -137,7 +137,6 @@ function showBookDetail(bookId) {
         '';
     
     detailContainer.innerHTML = `
-        ${imageHtml}
         <h2 class="detail-title">${escapeHtml(book.title)}</h2>
         <p class="detail-author">${escapeHtml(book.author)}</p>
         
@@ -145,6 +144,8 @@ function showBookDetail(bookId) {
             <h3>概要</h3>
             <p>${escapeHtml(book.description)}</p>
         </div>
+        
+        ${imageHtml}
         
         <div class="detail-section">
             <h3>レビュー</h3>
@@ -435,7 +436,7 @@ async function saveBook(bookId) {
         };
         
         const db = window.firebaseDb;
-        const { collection, doc, addDoc, updateDoc } = window.firestore;
+        const { collection, doc, addDoc, setDoc, updateDoc, getDoc } = window.firestore;
         
         if (bookId) {
             // 更新 - bookIdがFirestoreのドキュメントIDかローカルのIDかを確認
@@ -444,15 +445,29 @@ async function saveBook(bookId) {
             const firestoreId = localBook?.firestoreId || bookId.toString();
             
             const bookRef = doc(db, 'books', firestoreId);
-            await updateDoc(bookRef, bookData);
+            
+            // ドキュメントが存在するか確認
+            const docSnap = await getDoc(bookRef);
+            
+            if (docSnap.exists()) {
+                // ドキュメントが存在する場合は更新
+                await updateDoc(bookRef, bookData);
+            } else {
+                // ドキュメントが存在しない場合は新規作成（setDocでmerge: true）
+                await setDoc(bookRef, bookData, { merge: true });
+            }
             
             // ローカルのbooksDataも更新
             const index = booksData.findIndex(b => b.id === bookId);
             if (index !== -1) {
-                booksData[index] = { ...booksData[index], ...bookData };
+                booksData[index] = { 
+                    ...booksData[index], 
+                    firestoreId: firestoreId,
+                    ...bookData 
+                };
             }
             
-            alert('本を更新しました');
+            alert('本を保存しました');
         } else {
             // 新規追加
             const docRef = await addDoc(collection(db, 'books'), bookData);
