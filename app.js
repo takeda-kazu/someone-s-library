@@ -14,7 +14,79 @@ document.addEventListener('DOMContentLoaded', () => {
 function initializeApp() {
     setupEventListeners();
     setupAuthStateListener();
-    renderBookList();
+    // Firestoreからデータを読み込む（認証不要で読み取り可能な場合）
+    loadBooksFromFirestore();
+}
+
+// Firestoreから書籍データを読み込む
+async function loadBooksFromFirestore() {
+    // Firebaseが初期化されるまで待つ
+    const checkFirebase = setInterval(async () => {
+        if (window.firebaseDb && window.firestore) {
+            clearInterval(checkFirebase);
+            
+            try {
+                const db = window.firebaseDb;
+                const { collection, getDocs, query, orderBy } = window.firestore;
+                
+                const booksCollection = collection(db, 'books');
+                const querySnapshot = await getDocs(booksCollection);
+                
+                if (!querySnapshot.empty) {
+                    // Firestoreからデータを取得
+                    const firestoreBooks = [];
+                    let maxId = 0;
+                    
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        // ドキュメントIDが数値の場合はそれを使用、そうでない場合は連番を生成
+                        let bookId;
+                        const parsedId = parseInt(doc.id);
+                        if (!isNaN(parsedId) && parsedId > 0) {
+                            bookId = parsedId;
+                        } else {
+                            // 既存のbooksDataから最大IDを取得
+                            maxId = Math.max(maxId, ...booksData.map(b => b.id || 0));
+                            bookId = maxId + 1;
+                            maxId = bookId;
+                        }
+                        
+                        firestoreBooks.push({
+                            id: bookId,
+                            firestoreId: doc.id,
+                            title: data.title || '',
+                            author: data.author || '',
+                            imageUrl: data.imageUrl || '',
+                            description: data.description || '',
+                            review: data.review || '',
+                            insights: data.insights || '',
+                            keywords: data.keywords || []
+                        });
+                    });
+                    
+                    // booksDataを更新（Firestoreのデータを優先）
+                    booksData.length = 0;
+                    booksData.push(...firestoreBooks);
+                    
+                    renderBookList();
+                } else {
+                    // Firestoreにデータがない場合はローカルデータを表示
+                    renderBookList();
+                }
+            } catch (error) {
+                console.error('Firestore読み込みエラー:', error);
+                // エラーが発生した場合はローカルデータを表示
+                renderBookList();
+            }
+        }
+    }, 100);
+    
+    // タイムアウト（5秒）
+    setTimeout(() => {
+        clearInterval(checkFirebase);
+        // タイムアウトした場合もローカルデータを表示
+        renderBookList();
+    }, 5000);
 }
 
 // 認証状態の監視
@@ -34,6 +106,8 @@ function setupAuthStateListener() {
                     document.getElementById('admin-mode-btn').style.display = 'none';
                     document.getElementById('normal-mode-btn').style.display = 'inline-block';
                     document.getElementById('search-controls').style.display = 'flex';
+                    // ログイン時にデータを再読み込み
+                    loadBooksFromFirestore();
                 } else {
                     // ユーザーがログアウトしている
                     currentMode = 'normal';
@@ -484,7 +558,8 @@ async function saveBook(bookId) {
             alert('本を追加しました');
         }
         
-        renderBookList();
+        // Firestoreからデータを再読み込み
+        await loadBooksFromFirestore();
         showScreen('list');
     } catch (error) {
         console.error('保存エラー:', error);
@@ -515,7 +590,8 @@ async function deleteBook(bookId) {
         }
         
         alert('本を削除しました');
-        renderBookList();
+        // Firestoreからデータを再読み込み
+        await loadBooksFromFirestore();
         showScreen('list');
     } catch (error) {
         console.error('削除エラー:', error);
