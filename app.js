@@ -50,14 +50,19 @@ async function loadBooksFromFirestore() {
                             bookId = maxId + 1;
                             maxId = bookId;
                         }
-                        
+
                         firestoreBooks.push({
                             id: bookId,
                             firestoreId: doc.id,
                             title: data.title || '',
                             author: data.author || '',
                             imageUrl: data.imageUrl || '',
-                            description: data.description || '',
+                            introduction: data.introduction || data.description || '',
+                            summary: data.summary || data.description || '',
+                            quotes: data.quotes || [],
+                            reflections: data.reflections || [],
+                            // 後方互換性のため、古いフィールドも保持
+                            description: data.description || data.introduction || '',
                             review: data.review || '',
                             insights: data.insights || '',
                             keywords: data.keywords || []
@@ -189,8 +194,8 @@ function createBookCard(book) {
     
     card.innerHTML = `
         <h3 class="book-title">${escapeHtml(book.title)}</h3>
-        <p class="book-author">${escapeHtml(book.author)}</p>
-        <p class="book-description">${escapeHtml(book.description)}</p>
+        <p class="book-author">著者: ${escapeHtml(book.author)}</p>
+        <p class="book-description">${escapeHtml(book.introduction || book.description || '')}</p>
         ${imageHtml}
     `;
     
@@ -201,45 +206,90 @@ function createBookCard(book) {
 function showBookDetail(bookId) {
     const book = booksData.find(b => b.id === bookId);
     if (!book) return;
-    
+
     currentBookId = bookId;
     const detailContainer = document.getElementById('book-detail-content');
     if (!detailContainer) return;
-    
-    const imageHtml = book.imageUrl ? 
-        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="detail-image" onerror="this.style.display='none'">` : 
+
+    const imageHtml = book.imageUrl ?
+        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="detail-image" onerror="this.style.display='none'">` :
         '';
-    
+
+    // 引用セクションのHTML生成
+    const quotesHtml = book.quotes && book.quotes.length > 0 ? `
+        <div class="detail-section">
+            <h3 class="section-title">
+                <span class="section-icon">💬</span>
+                引用
+            </h3>
+            <div class="quotes-container">
+                ${book.quotes.map(quote => `
+                    <div class="quote-card">
+                        <h4 class="quote-title">${escapeHtml(quote.title)}</h4>
+                        <blockquote class="quote-content">${escapeHtml(quote.content)}</blockquote>
+                        <p class="quote-page">(${escapeHtml(quote.pageNumber)}貢)</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
+    // 考察セクションのHTML生成
+    const reflectionsHtml = book.reflections && book.reflections.length > 0 ? `
+        <div class="detail-section">
+            <h3 class="section-title">
+                <span class="section-icon">💡</span>
+                上司の考察
+            </h3>
+            <div class="reflections-container">
+                ${book.reflections.map(reflection => `
+                    <div class="reflection-card">
+                        <h4 class="reflection-title">${escapeHtml(reflection.title)}</h4>
+                        <p class="reflection-content">${escapeHtml(reflection.content)}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    ` : '';
+
     detailContainer.innerHTML = `
         <h2 class="detail-title">${escapeHtml(book.title)}</h2>
-        <p class="detail-author">${escapeHtml(book.author)}</p>
-        
-        <div class="detail-section">
-            <h3>概要</h3>
-            <p>${escapeHtml(book.description)}</p>
-        </div>
-        
+        <p class="detail-author">著者: ${escapeHtml(book.author)}</p>
+
         ${imageHtml}
-        
+
         <div class="detail-section">
-            <h3>レビュー</h3>
-            <p>${escapeHtml(book.review)}</p>
+            <h3 class="section-title">
+                <span class="section-icon">📖</span>
+                ご紹介
+            </h3>
+            <p>${escapeHtml(book.introduction || book.description || '')}</p>
         </div>
-        
+
         <div class="detail-section">
-            <h3>学んだこと・インサイト</h3>
-            <p>${escapeHtml(book.insights)}</p>
+            <h3 class="section-title">
+                <span class="section-icon">🟰</span>
+                本の要約
+            </h3>
+            <p>${escapeHtml(book.summary || book.description || '')}</p>
         </div>
-        
+
+        ${quotesHtml}
+
+        ${reflectionsHtml}
+
         <div class="detail-section">
-            <h3>キーワード</h3>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                ${book.keywords.map(keyword => 
-                    `<span style="padding: 0.25rem 0.75rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-full); font-size: 0.875rem;">${escapeHtml(keyword)}</span>`
+            <h3 class="section-title">
+                <span class="section-icon">🏷️</span>
+                キーワード
+            </h3>
+            <div class="keywords-container">
+                ${book.keywords.map(keyword =>
+                    `<span class="keyword-tag">${escapeHtml(keyword)}</span>`
                 ).join('')}
             </div>
         </div>
-        
+
         ${currentMode === 'admin' ? `
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <button onclick="showEditScreen(${bookId})" class="admin-button" style="flex: 1;">編集</button>
@@ -251,7 +301,7 @@ function showBookDetail(bookId) {
             </div>
         `}
     `;
-    
+
     showScreen('detail');
 }
 
@@ -438,39 +488,78 @@ function showEditScreen(bookId = null) {
     const book = bookId ? booksData.find(b => b.id === bookId) : null;
     const editContainer = document.getElementById('book-edit-content');
     if (!editContainer) return;
-    
+
+    // 引用データの整形
+    const quotesHtml = (book?.quotes || []).map((quote, index) => `
+        <div class="edit-quote-item" data-quote-id="${index}">
+            <h4>引用 ${index + 1}</h4>
+            <label>引用タイトル</label>
+            <input type="text" class="edit-input quote-title" value="${escapeHtml(quote.title || '')}" placeholder="例：新規事業における「適応課題」">
+            <label>引用内容</label>
+            <textarea class="edit-textarea quote-content" rows="4">${escapeHtml(quote.content || '')}</textarea>
+            <label>ページ番号</label>
+            <input type="text" class="edit-input quote-page" value="${escapeHtml(quote.pageNumber || '')}" placeholder="例：77-79">
+            <button type="button" class="delete-button" onclick="removeQuote(${index})">この引用を削除</button>
+        </div>
+    `).join('');
+
+    // 考察データの整形
+    const reflectionsHtml = (book?.reflections || []).map((reflection, index) => `
+        <div class="edit-reflection-item" data-reflection-id="${index}">
+            <h4>考察 ${index + 1}</h4>
+            <label>考察タイトル</label>
+            <input type="text" class="edit-input reflection-title" value="${escapeHtml(reflection.title || '')}" placeholder="例：前提条件を揃える努力">
+            <label>考察内容</label>
+            <textarea class="edit-textarea reflection-content" rows="4">${escapeHtml(reflection.content || '')}</textarea>
+            <button type="button" class="delete-button" onclick="removeReflection(${index})">この考察を削除</button>
+        </div>
+    `).join('');
+
     editContainer.innerHTML = `
         <h2 style="font-size: var(--font-size-2xl); font-weight: 700; margin-bottom: var(--spacing-xl);">
             ${book ? '本を編集' : '新しい本を追加'}
         </h2>
         <form class="edit-form" onsubmit="return false;">
             <div>
-                <label>タイトル</label>
+                <label>タイトル <span style="color: #ff6b6b;">*</span></label>
                 <input type="text" class="edit-input" id="edit-title" value="${book ? escapeHtml(book.title) : ''}" required>
             </div>
             <div>
-                <label>著者</label>
+                <label>著者 <span style="color: #ff6b6b;">*</span></label>
                 <input type="text" class="edit-input" id="edit-author" value="${book ? escapeHtml(book.author) : ''}" required>
             </div>
             <div>
                 <label>画像URL（Amazonなどの画像リンク）</label>
-                <input type="url" class="edit-input" id="edit-imageUrl" value="${book ? escapeHtml(book.imageUrl || '') : ''}" placeholder="https://example.com/image.jpg">
+                <input type="url" class="edit-input" id="edit-imageUrl" value="${book ? escapeHtml(book.imageUrl || '') : ''}" placeholder="https://m.media-amazon.com/images/I/...">
             </div>
             <div>
-                <label>概要</label>
-                <textarea class="edit-textarea" id="edit-description" required>${book ? escapeHtml(book.description) : ''}</textarea>
+                <label>📖 導入（ご紹介） <span style="color: #ff6b6b;">*</span></label>
+                <textarea class="edit-textarea" id="edit-introduction" rows="4" required>${book ? escapeHtml(book.introduction || book.description || '') : ''}</textarea>
             </div>
             <div>
-                <label>レビュー</label>
-                <textarea class="edit-textarea" id="edit-review" required>${book ? escapeHtml(book.review) : ''}</textarea>
+                <label>🟰 本の要約（核となる概念） <span style="color: #ff6b6b;">*</span></label>
+                <textarea class="edit-textarea" id="edit-summary" rows="4" required>${book ? escapeHtml(book.summary || book.description || '') : ''}</textarea>
             </div>
-            <div>
-                <label>学んだこと・インサイト</label>
-                <textarea class="edit-textarea" id="edit-insights" required>${book ? escapeHtml(book.insights) : ''}</textarea>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--color-surface); border-radius: var(--radius-md);">
+                <h3 style="margin-bottom: 1rem;">💬 引用（複数可）</h3>
+                <div id="quotes-container">
+                    ${quotesHtml || '<p style="color: var(--color-text-secondary);">引用が追加されていません</p>'}
+                </div>
+                <button type="button" class="admin-button" onclick="addQuote()" style="margin-top: 1rem;">+ 引用を追加</button>
             </div>
+
+            <div style="margin-top: 2rem; padding: 1.5rem; background: var(--color-surface); border-radius: var(--radius-md);">
+                <h3 style="margin-bottom: 1rem;">💡 上司の考察（複数可）</h3>
+                <div id="reflections-container">
+                    ${reflectionsHtml || '<p style="color: var(--color-text-secondary);">考察が追加されていません</p>'}
+                </div>
+                <button type="button" class="admin-button" onclick="addReflection()" style="margin-top: 1rem;">+ 考察を追加</button>
+            </div>
+
             <div>
-                <label>キーワード（カンマ区切り）</label>
-                <input type="text" class="edit-input" id="edit-keywords" value="${book ? book.keywords.join(', ') : ''}" required>
+                <label>🏷️ キーワード（カンマ区切り） <span style="color: #ff6b6b;">*</span></label>
+                <input type="text" class="edit-input" id="edit-keywords" value="${book ? book.keywords.join(', ') : ''}" required placeholder="例：対話, 適応課題, イノベーション">
             </div>
             <div class="edit-actions">
                 <button type="button" class="save-button" onclick="saveBook(${bookId})">
@@ -480,8 +569,66 @@ function showEditScreen(bookId = null) {
             </div>
         </form>
     `;
-    
+
     showScreen('edit');
+}
+
+// 引用を追加
+function addQuote() {
+    const container = document.getElementById('quotes-container');
+    const existingQuotes = container.querySelectorAll('.edit-quote-item');
+    const newIndex = existingQuotes.length;
+
+    const newQuoteHtml = `
+        <div class="edit-quote-item" data-quote-id="${newIndex}">
+            <h4>引用 ${newIndex + 1}</h4>
+            <label>引用タイトル</label>
+            <input type="text" class="edit-input quote-title" placeholder="例：新規事業における「適応課題」">
+            <label>引用内容</label>
+            <textarea class="edit-textarea quote-content" rows="4"></textarea>
+            <label>ページ番号</label>
+            <input type="text" class="edit-input quote-page" placeholder="例：77-79">
+            <button type="button" class="delete-button" onclick="removeQuote(${newIndex})">この引用を削除</button>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', newQuoteHtml);
+}
+
+// 引用を削除
+function removeQuote(index) {
+    const quoteItem = document.querySelector(`.edit-quote-item[data-quote-id="${index}"]`);
+    if (quoteItem) {
+        quoteItem.remove();
+    }
+}
+
+// 考察を追加
+function addReflection() {
+    const container = document.getElementById('reflections-container');
+    const existingReflections = container.querySelectorAll('.edit-reflection-item');
+    const newIndex = existingReflections.length;
+
+    const newReflectionHtml = `
+        <div class="edit-reflection-item" data-reflection-id="${newIndex}">
+            <h4>考察 ${newIndex + 1}</h4>
+            <label>考察タイトル</label>
+            <input type="text" class="edit-input reflection-title" placeholder="例：前提条件を揃える努力">
+            <label>考察内容</label>
+            <textarea class="edit-textarea reflection-content" rows="4"></textarea>
+            <button type="button" class="delete-button" onclick="removeReflection(${newIndex})">この考察を削除</button>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', newReflectionHtml);
+}
+
+// 考察を削除
+function removeReflection(index) {
+    const reflectionItem = document.querySelector(`.edit-reflection-item[data-reflection-id="${index}"]`);
+    if (reflectionItem) {
+        reflectionItem.remove();
+    }
 }
 
 async function saveBook(bookId) {
@@ -489,23 +636,55 @@ async function saveBook(bookId) {
         const title = document.getElementById('edit-title').value.trim();
         const author = document.getElementById('edit-author').value.trim();
         const imageUrl = document.getElementById('edit-imageUrl').value.trim();
-        const description = document.getElementById('edit-description').value.trim();
-        const review = document.getElementById('edit-review').value.trim();
-        const insights = document.getElementById('edit-insights').value.trim();
+        const introduction = document.getElementById('edit-introduction').value.trim();
+        const summary = document.getElementById('edit-summary').value.trim();
         const keywords = document.getElementById('edit-keywords').value.split(',').map(k => k.trim()).filter(k => k);
-        
-        if (!title || !author || !description || !review || !insights || keywords.length === 0) {
-            alert('すべての必須項目を入力してください');
+
+        // 引用データの収集
+        const quotes = [];
+        document.querySelectorAll('.edit-quote-item').forEach((item, index) => {
+            const title = item.querySelector('.quote-title')?.value.trim();
+            const content = item.querySelector('.quote-content')?.value.trim();
+            const pageNumber = item.querySelector('.quote-page')?.value.trim();
+
+            if (title && content) {
+                quotes.push({
+                    id: index + 1,
+                    title,
+                    content,
+                    pageNumber: pageNumber || ''
+                });
+            }
+        });
+
+        // 考察データの収集
+        const reflections = [];
+        document.querySelectorAll('.edit-reflection-item').forEach((item, index) => {
+            const title = item.querySelector('.reflection-title')?.value.trim();
+            const content = item.querySelector('.reflection-content')?.value.trim();
+
+            if (title && content) {
+                reflections.push({
+                    id: index + 1,
+                    title,
+                    content
+                });
+            }
+        });
+
+        if (!title || !author || !introduction || !summary || keywords.length === 0) {
+            alert('タイトル、著者、導入、本の要約、キーワードは必須項目です');
             return;
         }
-        
+
         const bookData = {
             title,
             author,
             imageUrl: imageUrl || '',
-            description,
-            review,
-            insights,
+            introduction,
+            summary,
+            quotes,
+            reflections,
             keywords
         };
         
