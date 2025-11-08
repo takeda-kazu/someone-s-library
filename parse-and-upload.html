@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>本のデータ一括アップロード</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background: #007aff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0051d5;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .log-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>本のデータ一括アップロード</h1>
+        <p>このツールは、all-books-data.jsのデータをFirestoreに一括アップロードします。</p>
+
+        <!-- 認証フォーム -->
+        <div id="auth-section" style="margin: 20px 0; padding: 20px; background: #f0f0f0; border-radius: 8px;">
+            <h3>ステップ1: 認証</h3>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <input type="email" id="email" placeholder="メールアドレス" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <input type="password" id="password" placeholder="パスワード" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                <button onclick="login()" style="width: auto;">ログイン</button>
+            </div>
+            <p id="auth-status" style="margin-top: 10px; color: #666;"></p>
+        </div>
+
+        <!-- アップロードボタン -->
+        <div style="margin: 20px 0;">
+            <h3>ステップ2: アップロード</h3>
+            <button id="upload-btn" onclick="uploadAllBooks()" disabled>全ての本をアップロード</button>
+            <button onclick="clearLog()">ログをクリア</button>
+        </div>
+
+        <div id="log"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBs8q4LIEnYpqk_PzaJwZO7I7C9gWu6MIk",
+            authDomain: "library-6632c.firebaseapp.com",
+            projectId: "library-6632c",
+            storageBucket: "library-6632c.firebasestorage.app",
+            messagingSenderId: "475019124517",
+            appId: "1:475019124517:web:69e3e6d5d81467a61944cc",
+            measurementId: "G-8GWPSS67D1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseCollection = collection;
+        window.firebaseAddDoc = addDoc;
+        window.firebaseGetDocs = getDocs;
+        window.firebaseSignIn = signInWithEmailAndPassword;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+
+        // 認証状態の監視
+        onAuthStateChanged(auth, (user) => {
+            const uploadBtn = document.getElementById('upload-btn');
+            const authStatus = document.getElementById('auth-status');
+
+            if (user) {
+                uploadBtn.disabled = false;
+                authStatus.textContent = `✓ ログイン済み: ${user.email}`;
+                authStatus.style.color = 'green';
+                addLog(`認証成功: ${user.email}`, 'success');
+            } else {
+                uploadBtn.disabled = true;
+                authStatus.textContent = '未認証';
+                authStatus.style.color = '#666';
+            }
+        });
+
+        console.log('Firebase initialized');
+    </script>
+
+    <script src="all-books-data.js"></script>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const logItem = document.createElement('div');
+            logItem.className = `log-item ${type}`;
+            logItem.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(logItem);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) {
+                alert('メールアドレスとパスワードを入力してください');
+                return;
+            }
+
+            try {
+                await window.firebaseSignIn(window.firebaseAuth, email, password);
+                addLog('ログインしました', 'success');
+            } catch (error) {
+                addLog(`ログイン失敗: ${error.message}`, 'error');
+                alert(`ログインに失敗しました: ${error.message}`);
+            }
+        }
+
+        async function uploadAllBooks() {
+            if (!window.firebaseDb) {
+                addLog('Firebase が初期化されていません', 'error');
+                return;
+            }
+
+            if (!window.allBooksData || allBooksData.length === 0) {
+                addLog('allBooksData が見つかりません', 'error');
+                return;
+            }
+
+            const confirmMsg = `${allBooksData.length}件の本をFirestoreにアップロードします。よろしいですか？`;
+            if (!confirm(confirmMsg)) {
+                addLog('キャンセルされました', 'info');
+                return;
+            }
+
+            addLog(`${allBooksData.length}件の本をアップロード開始`, 'info');
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const book of allBooksData) {
+                try {
+                    const docRef = await window.firebaseAddDoc(
+                        window.firebaseCollection(window.firebaseDb, 'books'),
+                        book
+                    );
+                    addLog(`✓ "${book.title}" (著者: ${book.author || '不明'}) をアップロードしました (ID: ${docRef.id})`, 'success');
+                    successCount++;
+
+                    // 少し待機してレート制限を回避
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    addLog(`✗ "${book.title}" のアップロードに失敗: ${error.message}`, 'error');
+                    errorCount++;
+                }
+            }
+
+            addLog(``, 'info');
+            addLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+            addLog(`完了: 成功 ${successCount}件、失敗 ${errorCount}件`, 'info');
+            addLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━`, 'info');
+        }
+
+        // ページ読み込み時
+        window.addEventListener('load', () => {
+            if (window.allBooksData) {
+                addLog(`${allBooksData.length}件の本がall-books-data.jsから読み込まれました`, 'success');
+                addLog(`準備完了: 「全ての本をアップロード」ボタンをクリックしてください`, 'info');
+            } else {
+                addLog('エラー: all-books-data.js が読み込めませんでした', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

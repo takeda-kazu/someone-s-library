@@ -215,42 +215,46 @@ function showBookDetail(bookId) {
         `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="detail-image" onerror="this.style.display='none'">` :
         '';
 
-    // 引用セクションのHTML生成
-    const quotesHtml = book.quotes && book.quotes.length > 0 ? `
-        <div class="detail-section">
-            <h3 class="section-title">
-                <span class="section-icon">💬</span>
-                引用
-            </h3>
-            <div class="quotes-container">
-                ${book.quotes.map(quote => `
-                    <div class="quote-card">
-                        <h4 class="quote-title">${escapeHtml(quote.title)}</h4>
-                        <blockquote class="quote-content">${escapeHtml(quote.content)}</blockquote>
-                        <p class="quote-page">(${escapeHtml(quote.pageNumber)}貢)</p>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    ` : '';
+    // 引用と考察を交互に表示するHTML生成
+    let quotesAndReflectionsHtml = '';
+    const quotes = book.quotes || [];
+    const reflections = book.reflections || [];
+    const maxLength = Math.max(quotes.length, reflections.length);
 
-    // 考察セクションのHTML生成
-    const reflectionsHtml = book.reflections && book.reflections.length > 0 ? `
-        <div class="detail-section">
-            <h3 class="section-title">
-                <span class="section-icon">💡</span>
-                上司の考察
-            </h3>
-            <div class="reflections-container">
-                ${book.reflections.map(reflection => `
-                    <div class="reflection-card">
-                        <h4 class="reflection-title">${escapeHtml(reflection.title)}</h4>
-                        <p class="reflection-content">${escapeHtml(reflection.content)}</p>
+    for (let i = 0; i < maxLength; i++) {
+        // 引用を表示
+        if (quotes[i]) {
+            quotesAndReflectionsHtml += `
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">💬</span>
+                        引用${i + 1}
+                    </h3>
+                    <div class="quote-card">
+                        <h4 class="quote-title">${escapeHtml(quotes[i].title)}</h4>
+                        <blockquote class="quote-content">${escapeHtml(quotes[i].content)}</blockquote>
+                        <p class="quote-page">(${escapeHtml(quotes[i].pageNumber)}貢)</p>
                     </div>
-                `).join('')}
-            </div>
-        </div>
-    ` : '';
+                </div>
+            `;
+        }
+
+        // 考察を表示
+        if (reflections[i]) {
+            quotesAndReflectionsHtml += `
+                <div class="detail-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">💡</span>
+                        上司の考察${i + 1}
+                    </h3>
+                    <div class="reflection-card">
+                        <h4 class="reflection-title">${escapeHtml(reflections[i].title)}</h4>
+                        <p class="reflection-content">${escapeHtml(reflections[i].content)}</p>
+                    </div>
+                </div>
+            `;
+        }
+    }
 
     detailContainer.innerHTML = `
         <h2 class="detail-title">${escapeHtml(book.title)}</h2>
@@ -274,9 +278,7 @@ function showBookDetail(bookId) {
             <p>${escapeHtml(book.summary || book.description || '')}</p>
         </div>
 
-        ${quotesHtml}
-
-        ${reflectionsHtml}
+        ${quotesAndReflectionsHtml}
 
         <div class="detail-section">
             <h3 class="section-title">
