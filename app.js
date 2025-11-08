@@ -13,7 +13,43 @@ document.addEventListener('DOMContentLoaded', () => {
 // アプリケーション初期化
 function initializeApp() {
     setupEventListeners();
+    setupAuthStateListener();
     renderBookList();
+}
+
+// 認証状態の監視
+function setupAuthStateListener() {
+    // Firebaseが初期化されるまで待つ
+    const checkAuth = setInterval(() => {
+        if (window.firebaseAuth && window.firebaseAuthFunctions) {
+            clearInterval(checkAuth);
+            const auth = window.firebaseAuth;
+            const { onAuthStateChanged } = window.firebaseAuthFunctions;
+            
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // ユーザーがログインしている
+                    currentMode = 'admin';
+                    isAuthenticated = true;
+                    document.getElementById('admin-mode-btn').style.display = 'none';
+                    document.getElementById('normal-mode-btn').style.display = 'inline-block';
+                    document.getElementById('search-controls').style.display = 'flex';
+                } else {
+                    // ユーザーがログアウトしている
+                    currentMode = 'normal';
+                    isAuthenticated = false;
+                    document.getElementById('admin-mode-btn').style.display = 'inline-block';
+                    document.getElementById('normal-mode-btn').style.display = 'none';
+                    document.getElementById('search-controls').style.display = 'none';
+                }
+            });
+        }
+    }, 100);
+    
+    // タイムアウト（5秒）
+    setTimeout(() => {
+        clearInterval(checkAuth);
+    }, 5000);
 }
 
 // イベントリスナー設定
@@ -167,7 +203,16 @@ function switchToAdminMode() {
     renderBookList();
 }
 
-function switchToNormalMode() {
+async function switchToNormalMode() {
+    try {
+        const auth = window.firebaseAuth;
+        const { signOut } = window.firebaseAuthFunctions;
+        
+        await signOut(auth);
+    } catch (error) {
+        console.error('ログアウトエラー:', error);
+    }
+    
     currentMode = 'normal';
     isAuthenticated = false;
     document.getElementById('admin-mode-btn').style.display = 'inline-block';
@@ -189,17 +234,38 @@ function closeAuthModal() {
     document.getElementById('auth-password').value = '';
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('auth-email').value;
+    const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
     
-    // デモ用の簡易認証（実際はFirebase Authを使用）
-    if (email && password) {
+    if (!email || !password) {
+        alert('メールアドレスとパスワードを入力してください');
+        return;
+    }
+    
+    try {
+        const auth = window.firebaseAuth;
+        const { signInWithEmailAndPassword } = window.firebaseAuthFunctions;
+        
+        await signInWithEmailAndPassword(auth, email, password);
         closeAuthModal();
         switchToAdminMode();
-    } else {
-        alert('メールアドレスとパスワードを入力してください');
+    } catch (error) {
+        console.error('ログインエラー:', error);
+        let errorMessage = 'ログインに失敗しました';
+        
+        if (error.code === 'auth/user-not-found') {
+            errorMessage = 'ユーザーが見つかりません';
+        } else if (error.code === 'auth/wrong-password') {
+            errorMessage = 'パスワードが正しくありません';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'メールアドレスの形式が正しくありません';
+        } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = 'ログイン試行回数が多すぎます。しばらく待ってから再試行してください';
+        }
+        
+        alert(errorMessage);
     }
 }
 
