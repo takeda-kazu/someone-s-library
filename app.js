@@ -188,10 +188,10 @@ function createBookCard(book) {
         '';
     
     card.innerHTML = `
-        ${imageHtml}
         <h3 class="book-title">${escapeHtml(book.title)}</h3>
         <p class="book-author">${escapeHtml(book.author)}</p>
         <p class="book-description">${escapeHtml(book.description)}</p>
+        ${imageHtml}
     `;
     
     return card;
