@@ -73,14 +73,14 @@ function createBookCard(book) {
     card.setAttribute('role', 'listitem');
     card.onclick = () => showBookDetail(book.id);
     
-    const stars = '★'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
+    const imageHtml = book.imageUrl ? 
+        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="book-image" onerror="this.style.display='none'">` : 
+        '';
     
     card.innerHTML = `
+        ${imageHtml}
         <h3 class="book-title">${escapeHtml(book.title)}</h3>
         <p class="book-author">${escapeHtml(book.author)}</p>
-        <div class="book-rating" aria-label="評価: ${book.rating}つ星">
-            ${stars.split('').map(star => `<span class="star">${star}</span>`).join('')}
-        </div>
         <p class="book-description">${escapeHtml(book.description)}</p>
     `;
     
@@ -96,15 +96,14 @@ function showBookDetail(bookId) {
     const detailContainer = document.getElementById('book-detail-content');
     if (!detailContainer) return;
     
-    const stars = '★'.repeat(book.rating) + '☆'.repeat(5 - book.rating);
+    const imageHtml = book.imageUrl ? 
+        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="detail-image" onerror="this.style.display='none'">` : 
+        '';
     
     detailContainer.innerHTML = `
+        ${imageHtml}
         <h2 class="detail-title">${escapeHtml(book.title)}</h2>
         <p class="detail-author">${escapeHtml(book.author)}</p>
-        
-        <div class="book-rating" style="margin-bottom: 2rem;" aria-label="評価: ${book.rating}つ星">
-            ${stars.split('').map(star => `<span class="star">${star}</span>`).join('')}
-        </div>
         
         <div class="detail-section">
             <h3>概要</h3>
@@ -313,8 +312,8 @@ function showEditScreen(bookId = null) {
                 <input type="text" class="edit-input" id="edit-author" value="${book ? escapeHtml(book.author) : ''}" required>
             </div>
             <div>
-                <label>評価（1-5）</label>
-                <input type="number" class="edit-input" id="edit-rating" min="1" max="5" value="${book ? book.rating : 5}" required>
+                <label>画像URL（Amazonなどの画像リンク）</label>
+                <input type="url" class="edit-input" id="edit-imageUrl" value="${book ? escapeHtml(book.imageUrl || '') : ''}" placeholder="https://example.com/image.jpg">
             </div>
             <div>
                 <label>概要</label>
