@@ -343,17 +343,102 @@ function showEditScreen(bookId = null) {
     showScreen('edit');
 }
 
-function saveBook(bookId) {
-    // 実際はFirestoreに保存
-    alert('保存機能は実装中です（Firebaseとの連携が必要）');
-    showScreen('list');
+async function saveBook(bookId) {
+    try {
+        const title = document.getElementById('edit-title').value.trim();
+        const author = document.getElementById('edit-author').value.trim();
+        const imageUrl = document.getElementById('edit-imageUrl').value.trim();
+        const description = document.getElementById('edit-description').value.trim();
+        const review = document.getElementById('edit-review').value.trim();
+        const insights = document.getElementById('edit-insights').value.trim();
+        const keywords = document.getElementById('edit-keywords').value.split(',').map(k => k.trim()).filter(k => k);
+        
+        if (!title || !author || !description || !review || !insights || keywords.length === 0) {
+            alert('すべての必須項目を入力してください');
+            return;
+        }
+        
+        const bookData = {
+            title,
+            author,
+            imageUrl: imageUrl || '',
+            description,
+            review,
+            insights,
+            keywords
+        };
+        
+        const db = window.firebaseDb;
+        const { collection, doc, addDoc, updateDoc } = window.firestore;
+        
+        if (bookId) {
+            // 更新 - bookIdがFirestoreのドキュメントIDかローカルのIDかを確認
+            // まずローカルのbooksDataからfirestoreIdを取得
+            const localBook = booksData.find(b => b.id === bookId);
+            const firestoreId = localBook?.firestoreId || bookId.toString();
+            
+            const bookRef = doc(db, 'books', firestoreId);
+            await updateDoc(bookRef, bookData);
+            
+            // ローカルのbooksDataも更新
+            const index = booksData.findIndex(b => b.id === bookId);
+            if (index !== -1) {
+                booksData[index] = { ...booksData[index], ...bookData };
+            }
+            
+            alert('本を更新しました');
+        } else {
+            // 新規追加
+            const docRef = await addDoc(collection(db, 'books'), bookData);
+            const firestoreId = docRef.id;
+            
+            // ローカルのbooksDataにも追加
+            const newId = Math.max(...booksData.map(b => b.id), 0) + 1;
+            booksData.push({ 
+                id: newId, 
+                firestoreId: firestoreId,
+                ...bookData 
+            });
+            
+            alert('本を追加しました');
+        }
+        
+        renderBookList();
+        showScreen('list');
+    } catch (error) {
+        console.error('保存エラー:', error);
+        alert('保存に失敗しました: ' + error.message);
+    }
 }
 
-function deleteBook(bookId) {
-    if (confirm('本当に削除しますか？')) {
-        // 実際はFirestoreから削除
-        alert('削除機能は実装中です（Firebaseとの連携が必要）');
+async function deleteBook(bookId) {
+    if (!confirm('本当に削除しますか？')) {
+        return;
+    }
+    
+    try {
+        const db = window.firebaseDb;
+        const { doc, deleteDoc } = window.firestore;
+        
+        // ローカルのbooksDataからfirestoreIdを取得
+        const localBook = booksData.find(b => b.id === bookId);
+        const firestoreId = localBook?.firestoreId || bookId.toString();
+        
+        const bookRef = doc(db, 'books', firestoreId);
+        await deleteDoc(bookRef);
+        
+        // ローカルのbooksDataからも削除
+        const index = booksData.findIndex(b => b.id === bookId);
+        if (index !== -1) {
+            booksData.splice(index, 1);
+        }
+        
+        alert('本を削除しました');
+        renderBookList();
         showScreen('list');
+    } catch (error) {
+        console.error('削除エラー:', error);
+        alert('削除に失敗しました: ' + error.message);
     }
 }
 

@@ -13,7 +13,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -35,6 +35,18 @@
         window.firebaseApp = app;
         window.firebaseAuth = auth;
         window.firebaseDb = db;
+        
+        // Firestore関数もグローバルに公開
+        window.firestore = {
+            collection,
+            doc,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            getDocs,
+            query,
+            orderBy
+        };
 
         console.log('Firebase initialized successfully');
     </script>
