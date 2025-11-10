@@ -300,6 +300,43 @@
         </div>
     </div>
 
+    <!-- 閲覧パスワードモーダル -->
+    <div
+        id="view-password-modal"
+        class="modal"
+        style="display: none;"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="view-password-title">
+        <div class="modal-overlay" aria-hidden="true"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="view-password-title">パスワードを入力してください</h2>
+            </div>
+            <form class="auth-form" id="view-password-form" onsubmit="return false;">
+                <label for="view-password-input" class="visually-hidden">パスワード</label>
+                <input
+                    type="password"
+                    id="view-password-input"
+                    placeholder="パスワード"
+                    class="auth-input"
+                    required
+                    autocomplete="off"
+                    aria-required="true">
+                <div id="view-password-error" style="color: #f5576c; margin-top: 0.5rem; display: none;">
+                    パスワードが正しくありません
+                </div>
+                <button
+                    id="view-password-btn"
+                    class="auth-button"
+                    type="submit"
+                    aria-label="パスワードを確認">
+                    確認
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Status messages for screen reader announcements -->
     <div role="status" aria-live="polite" aria-atomic="true" class="visually-hidden" id="status-message"></div>
 </body>

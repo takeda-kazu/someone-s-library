@@ -3,12 +3,68 @@ let currentMode = 'normal'; // 'normal' or 'admin'
 let currentScreen = 'list'; // 'list', 'detail', 'edit'
 let currentBookId = null;
 let isAuthenticated = false;
+let isViewPasswordVerified = false; // 閲覧パスワード検証済みフラグ
+
+// 閲覧用パスワード（実際の運用では環境変数などから取得すべき）
+const VIEW_PASSWORD = 'teijin';
 
 // DOM読み込み後に実行
 document.addEventListener('DOMContentLoaded', () => {
     console.log('App initialized');
-    initializeApp();
+    checkViewPassword();
 });
+
+// 閲覧パスワードチェック
+function checkViewPassword() {
+    // セッションストレージでパスワード検証済みかチェック
+    const verified = sessionStorage.getItem('viewPasswordVerified');
+
+    if (verified === 'true') {
+        isViewPasswordVerified = true;
+        initializeApp();
+    } else {
+        // パスワードモーダルを表示
+        showViewPasswordModal();
+    }
+}
+
+// 閲覧パスワードモーダルを表示
+function showViewPasswordModal() {
+    const modal = document.getElementById('view-password-modal');
+    const form = document.getElementById('view-password-form');
+    const input = document.getElementById('view-password-input');
+    const error = document.getElementById('view-password-error');
+    const btn = document.getElementById('view-password-btn');
+
+    modal.style.display = 'flex';
+
+    // フォームの送信処理
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const password = input.value.trim();
+
+        if (password === VIEW_PASSWORD) {
+            // パスワード正解
+            isViewPasswordVerified = true;
+            sessionStorage.setItem('viewPasswordVerified', 'true');
+            modal.style.display = 'none';
+            error.style.display = 'none';
+            input.value = '';
+            initializeApp();
+        } else {
+            // パスワード不正解
+            error.style.display = 'block';
+            input.value = '';
+            input.focus();
+        }
+    };
+
+    form.addEventListener('submit', handleSubmit);
+    btn.addEventListener('click', handleSubmit);
+
+    // モーダルが表示されたら入力欄にフォーカス
+    setTimeout(() => input.focus(), 100);
+}
 
 // アプリケーション初期化
 function initializeApp() {
