@@ -70,6 +70,7 @@ function showViewPasswordModal() {
 function initializeApp() {
     setupEventListeners();
     setupAuthStateListener();
+    setupHistoryListener();
     // Firestoreからデータを読み込む（認証不要で読み取り可能な場合）
     loadBooksFromFirestore();
 }
@@ -150,6 +151,34 @@ async function loadBooksFromFirestore() {
     }, 5000);
 }
 
+// ブラウザの履歴管理の設定
+function setupHistoryListener() {
+    // 初期状態を履歴に追加
+    if (!window.history.state) {
+        window.history.replaceState({ screen: 'list' }, '', '');
+    }
+
+    // ブラウザの戻る/進むボタンに対応
+    window.addEventListener('popstate', (event) => {
+        if (event.state) {
+            const screen = event.state.screen;
+            const bookId = event.state.bookId;
+
+            if (screen === 'list') {
+                showScreenWithoutHistory('list');
+            } else if (screen === 'detail' && bookId) {
+                showBookDetailWithoutHistory(bookId);
+            } else if (screen === 'edit') {
+                if (bookId) {
+                    showEditScreenWithoutHistory(bookId);
+                } else {
+                    showEditScreenWithoutHistory();
+                }
+            }
+        }
+    });
+}
+
 // 認証状態の監視
 function setupAuthStateListener() {
     // Firebaseが初期化されるまで待つ
@@ -199,8 +228,12 @@ function setupEventListeners() {
     document.getElementById('auth-login-btn')?.addEventListener('click', handleLogin);
     
     // 画面遷移
-    document.getElementById('back-btn')?.addEventListener('click', () => showScreen('list'));
-    document.getElementById('back-edit-btn')?.addEventListener('click', () => showScreen('list'));
+    document.getElementById('back-btn')?.addEventListener('click', () => {
+        window.history.back();
+    });
+    document.getElementById('back-edit-btn')?.addEventListener('click', () => {
+        window.history.back();
+    });
     
     // 検索・フィルター
     document.getElementById('search-input')?.addEventListener('input', filterBooks);
@@ -243,23 +276,32 @@ function createBookCard(book) {
     card.className = 'book-card';
     card.setAttribute('role', 'listitem');
     card.onclick = () => showBookDetail(book.id);
-    
-    const imageHtml = book.imageUrl ? 
-        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="book-image" onerror="this.style.display='none'">` : 
+
+    const imageHtml = book.imageUrl ?
+        `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(book.title)}の表紙" class="book-image" onerror="this.style.display='none'">` :
         '';
-    
+
     card.innerHTML = `
-        <h3 class="book-title">${escapeHtml(book.title)}</h3>
-        <p class="book-author">著者: ${escapeHtml(book.author)}</p>
-        <p class="book-description">${escapeHtml(book.introduction || book.description || '')}</p>
+        <div class="book-card-header">
+            <h3 class="book-title">${escapeHtml(book.title)}</h3>
+            <p class="book-author">著者: ${escapeHtml(book.author)}</p>
+        </div>
         ${imageHtml}
+        <p class="book-description">${escapeHtml(book.introduction || book.description || '')}</p>
     `;
-    
+
     return card;
 }
 
-// 書籍詳細表示
+// 書籍詳細表示（履歴に追加）
 function showBookDetail(bookId) {
+    showBookDetailWithoutHistory(bookId);
+    // 履歴に追加
+    window.history.pushState({ screen: 'detail', bookId: bookId }, '', '');
+}
+
+// 書籍詳細表示（履歴に追加しない）
+function showBookDetailWithoutHistory(bookId) {
     const book = booksData.find(b => b.id === bookId);
     if (!book) return;
 
@@ -360,18 +402,30 @@ function showBookDetail(bookId) {
         `}
     `;
 
-    showScreen('detail');
+    showScreenWithoutHistory('detail');
 }
 
-// 画面切り替え
-function showScreen(screenName) {
+// 画面切り替え（履歴に追加）
+function showScreen(screenName, bookId = null) {
+    showScreenWithoutHistory(screenName);
+
+    // 履歴に追加
+    const state = { screen: screenName };
+    if (bookId) {
+        state.bookId = bookId;
+    }
+    window.history.pushState(state, '', '');
+}
+
+// 画面切り替え（履歴に追加しない）
+function showScreenWithoutHistory(screenName) {
     document.getElementById('screen-list').style.display = 'none';
     document.getElementById('screen-detail').style.display = 'none';
     document.getElementById('screen-edit').style.display = 'none';
-    
+
     document.getElementById(`screen-${screenName}`).style.display = 'block';
     currentScreen = screenName;
-    
+
     announceToScreenReader(`${screenName === 'list' ? '一覧' : screenName === 'detail' ? '詳細' : '編集'}画面に移動しました`);
 }
 
@@ -541,8 +595,19 @@ function updateAuthorFilter() {
     authorFilter.value = currentValue;
 }
 
-// 編集画面
+// 編集画面（履歴に追加）
 function showEditScreen(bookId = null) {
+    showEditScreenWithoutHistory(bookId);
+    // 履歴に追加
+    const state = { screen: 'edit' };
+    if (bookId) {
+        state.bookId = bookId;
+    }
+    window.history.pushState(state, '', '');
+}
+
+// 編集画面（履歴に追加しない）
+function showEditScreenWithoutHistory(bookId = null) {
     const book = bookId ? booksData.find(b => b.id === bookId) : null;
     const editContainer = document.getElementById('book-edit-content');
     if (!editContainer) return;
@@ -628,7 +693,7 @@ function showEditScreen(bookId = null) {
         </form>
     `;
 
-    showScreen('edit');
+    showScreenWithoutHistory('edit');
 }
 
 // 引用を追加
