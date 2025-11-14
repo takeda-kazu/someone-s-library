@@ -77,11 +77,13 @@ function initializeApp() {
 
 // Firestoreから書籍データを読み込む
 async function loadBooksFromFirestore() {
+    showLoading('書籍データを読み込んでいます...');
+
     // Firebaseが初期化されるまで待つ
     const checkFirebase = setInterval(async () => {
         if (window.firebaseDb && window.firestore) {
             clearInterval(checkFirebase);
-            
+
             try {
                 const db = window.firebaseDb;
                 const { collection, getDocs, query, orderBy } = window.firestore;
@@ -129,25 +131,30 @@ async function loadBooksFromFirestore() {
                     // booksDataを更新（Firestoreのデータを優先）
                     booksData.length = 0;
                     booksData.push(...firestoreBooks);
-                    
+
                     renderBookList();
+                    hideLoading();
                 } else {
                     // Firestoreにデータがない場合はローカルデータを表示
                     renderBookList();
+                    hideLoading();
                 }
             } catch (error) {
                 console.error('Firestore読み込みエラー:', error);
+                showToast('データの読み込みに失敗しました', 'error');
                 // エラーが発生した場合はローカルデータを表示
                 renderBookList();
+                hideLoading();
             }
         }
     }, 100);
-    
+
     // タイムアウト（5秒）
     setTimeout(() => {
         clearInterval(checkFirebase);
         // タイムアウトした場合もローカルデータを表示
         renderBookList();
+        hideLoading();
     }, 5000);
 }
 
@@ -477,7 +484,7 @@ async function handleLogin(e) {
     const password = document.getElementById('auth-password').value;
     
     if (!email || !password) {
-        alert('メールアドレスとパスワードを入力してください');
+        showToast('メールアドレスとパスワードを入力してください', 'warning');
         return;
     }
     
@@ -502,7 +509,7 @@ async function handleLogin(e) {
             errorMessage = 'ログイン試行回数が多すぎます。しばらく待ってから再試行してください';
         }
         
-        alert(errorMessage);
+        showToast(errorMessage, 'error', 'ログインエラー');
     }
 }
 
@@ -551,7 +558,7 @@ async function copyPromptText() {
             closePromptModal();
             showCopySuccessModal();
         } catch (fallbackError) {
-            alert('コピーに失敗しました。手動でコピーしてください。');
+            showToast('コピーに失敗しました。手動でコピーしてください。', 'error');
         }
     }
 }
@@ -808,7 +815,7 @@ async function saveBook(bookId) {
         });
 
         if (!title || !author || !introduction || !summary || keywords.length === 0) {
-            alert('タイトル、著者、導入、本の要約、キーワードは必須項目です');
+            showToast('タイトル、著者、導入、本の要約、キーワードは必須項目です', 'warning', '入力エラー');
             return;
         }
 
@@ -855,7 +862,7 @@ async function saveBook(bookId) {
                 };
             }
             
-            alert('本を保存しました');
+            showToast('本の情報を保存しました', 'success');
         } else {
             // 新規追加
             const docRef = await addDoc(collection(db, 'books'), bookData);
@@ -869,7 +876,7 @@ async function saveBook(bookId) {
                 ...bookData 
             });
             
-            alert('本を追加しました');
+            showToast('新しい本を追加しました', 'success');
         }
         
         // Firestoreからデータを再読み込み
@@ -877,7 +884,7 @@ async function saveBook(bookId) {
         showScreen('list');
     } catch (error) {
         console.error('保存エラー:', error);
-        alert('保存に失敗しました: ' + error.message);
+        showToast('保存に失敗しました: ' + error.message, 'error', '保存エラー');
     }
 }
 
@@ -903,13 +910,13 @@ async function deleteBook(bookId) {
             booksData.splice(index, 1);
         }
         
-        alert('本を削除しました');
+        showToast('本を削除しました', 'success');
         // Firestoreからデータを再読み込み
         await loadBooksFromFirestore();
         showScreen('list');
     } catch (error) {
         console.error('削除エラー:', error);
-        alert('削除に失敗しました: ' + error.message);
+        showToast('削除に失敗しました: ' + error.message, 'error', '削除エラー');
     }
 }
 
@@ -927,6 +934,81 @@ function announceToScreenReader(message) {
         setTimeout(() => {
             statusElement.textContent = '';
         }, 1000);
+    }
+}
+
+// ローディング表示
+function showLoading(message = '読み込み中...') {
+    const loadingEl = document.getElementById('loading-indicator');
+    const textEl = loadingEl.querySelector('.loading-text');
+    if (textEl) {
+        textEl.textContent = message;
+    }
+    loadingEl.style.display = 'flex';
+}
+
+function hideLoading() {
+    const loadingEl = document.getElementById('loading-indicator');
+    loadingEl.style.display = 'none';
+}
+
+// トースト通知
+function showToast(message, type = 'info', title = '', duration = 4000) {
+    const container = document.getElementById('toast-container');
+    const toastId = `toast-${Date.now()}`;
+
+    // アイコンの選択
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+
+    // タイトルのデフォルト値
+    const titles = {
+        success: '成功',
+        error: 'エラー',
+        warning: '警告',
+        info: 'お知らせ'
+    };
+
+    const toastTitle = title || titles[type] || titles.info;
+    const toastIcon = icons[type] || icons.info;
+
+    // トースト要素を作成
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.id = toastId;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <span class="toast-icon">${toastIcon}</span>
+        <div class="toast-content">
+            <h3 class="toast-title">${escapeHtml(toastTitle)}</h3>
+            <p class="toast-message">${escapeHtml(message)}</p>
+        </div>
+        <button class="toast-close" onclick="removeToast('${toastId}')" aria-label="通知を閉じる">
+            <span aria-hidden="true">×</span>
+        </button>
+    `;
+
+    container.appendChild(toast);
+
+    // 自動削除
+    if (duration > 0) {
+        setTimeout(() => {
+            removeToast(toastId);
+        }, duration);
+    }
+}
+
+function removeToast(toastId) {
+    const toast = document.getElementById(toastId);
+    if (toast) {
+        toast.classList.add('toast-exit');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
     }
 }
 

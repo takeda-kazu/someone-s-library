@@ -336,6 +336,19 @@
 
     <!-- Status messages for screen reader announcements -->
     <div role="status" aria-live="polite" aria-atomic="true" class="visually-hidden" id="status-message"></div>
+
+    <!-- ローディングインジケーター -->
+    <div id="loading-indicator" class="loading-overlay" style="display: none;" role="status" aria-live="polite">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <p class="loading-text">読み込み中...</p>
+        </div>
+    </div>
+
+    <!-- トースト通知コンテナ -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
 
