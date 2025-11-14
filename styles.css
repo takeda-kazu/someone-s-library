@@ -290,8 +290,8 @@ button:focus-visible {
 /* ===== 本のリスト ===== */
 #book-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
     margin-top: var(--spacing-xl);
 }
 
@@ -299,7 +299,7 @@ button:focus-visible {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    padding: var(--spacing-md);
     backdrop-filter: var(--blur-md);
     -webkit-backdrop-filter: var(--blur-md);
     transition: all var(--transition-base);
@@ -308,7 +308,7 @@ button:focus-visible {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
     box-shadow: var(--shadow-sm);
 }
 
@@ -366,7 +366,7 @@ button:focus-visible {
 }
 
 .book-title {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-base);
     font-weight: 700;
     color: var(--color-text-primary);
     letter-spacing: -0.01em;
@@ -375,7 +375,7 @@ button:focus-visible {
 }
 
 .book-author {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
     margin: 0;
     font-weight: 500;
@@ -383,7 +383,7 @@ button:focus-visible {
 
 .book-image {
     width: 100%;
-    max-width: 240px;
+    max-width: 160px;
     height: auto;
     border-radius: var(--radius-md);
     object-fit: cover;
@@ -397,15 +397,15 @@ button:focus-visible {
 }
 
 .book-description {
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
-    line-height: 1.8;
+    line-height: 1.6;
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin: 0;
-    padding: var(--spacing-sm) 0;
+    padding: var(--spacing-xs) 0;
 }
 
 /* ===== 詳細画面 ===== */
@@ -765,6 +765,18 @@ button:focus-visible {
 }
 
 /* ===== レスポンシブデザイン ===== */
+@media (max-width: 1200px) {
+    #book-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    #book-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
     :root {
         --font-size-3xl: 2rem;
@@ -859,7 +871,7 @@ button:focus-visible {
 /* ===== グリッド表示の調整 ===== */
 @media (min-width: 1400px) {
     #book-list {
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
