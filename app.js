@@ -331,7 +331,7 @@ function showBookDetailWithoutHistory(bookId) {
                     <div class="quote-card">
                         <h4 class="quote-title">${escapeHtml(quotes[i].title)}</h4>
                         <blockquote class="quote-content">${escapeHtml(quotes[i].content)}</blockquote>
-                        <p class="quote-page">(${escapeHtml(quotes[i].pageNumber)}貢)</p>
+                        <p class="quote-page">(${escapeHtml(quotes[i].pageNumber)}頁)</p>
                     </div>
                 </div>
             `;
@@ -535,13 +535,25 @@ function closePromptModal() {
     document.getElementById('prompt-modal').style.display = 'none';
 }
 
-function copyPromptText() {
+async function copyPromptText() {
     const promptText = document.getElementById('prompt-text');
-    promptText.select();
-    document.execCommand('copy');
-    
-    closePromptModal();
-    showCopySuccessModal();
+
+    try {
+        await navigator.clipboard.writeText(promptText.value);
+        closePromptModal();
+        showCopySuccessModal();
+    } catch (error) {
+        console.error('コピーに失敗しました:', error);
+        // フォールバック: 古い方法を試す
+        promptText.select();
+        try {
+            document.execCommand('copy');
+            closePromptModal();
+            showCopySuccessModal();
+        } catch (fallbackError) {
+            alert('コピーに失敗しました。手動でコピーしてください。');
+        }
+    }
 }
 
 function showCopySuccessModal() {
