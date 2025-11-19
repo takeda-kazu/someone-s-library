@@ -1,354 +1,490 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="個人の本棚管理システム - 読書記録と感想を保存・共有">
-    <meta name="theme-color" content="#000000">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="個人の本棚管理システム - 読書記録と感想を保存・共有"
+    />
+    <meta name="theme-color" content="#000000" />
     <title>〇〇本棚 - Library Watch</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 
     <!-- Firebase SDK -->
     <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-        import { getFirestore, collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDocs, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        doc,
+        addDoc,
+        setDoc,
+        updateDoc,
+        deleteDoc,
+        getDocs,
+        query,
+        orderBy,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBs8q4LIEnYpqk_PzaJwZO7I7C9gWu6MIk",
-            authDomain: "library-6632c.firebaseapp.com",
-            projectId: "library-6632c",
-            storageBucket: "library-6632c.firebasestorage.app",
-            messagingSenderId: "475019124517",
-            appId: "1:475019124517:web:69e3e6d5d81467a61944cc",
-            measurementId: "G-8GWPSS67D1"
-        };
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs8q4LIEnYpqk_PzaJwZO7I7C9gWu6MIk",
+        authDomain: "library-6632c.firebaseapp.com",
+        projectId: "library-6632c",
+        storageBucket: "library-6632c.firebasestorage.app",
+        messagingSenderId: "475019124517",
+        appId: "1:475019124517:web:69e3e6d5d81467a61944cc",
+        measurementId: "G-8GWPSS67D1",
+      };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-        // グローバル変数として設定
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        
-        // Firestore関数もグローバルに公開
-        window.firestore = {
-            collection,
-            doc,
-            addDoc,
-            setDoc,
-            updateDoc,
-            deleteDoc,
-            getDocs,
-            getDoc,
-            query,
-            orderBy
-        };
-        
-        // Firebase Auth関数もグローバルに公開
-        window.firebaseAuthFunctions = {
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged
-        };
+      // グローバル変数として設定
+      window.firebaseApp = app;
+      window.firebaseAuth = auth;
+      window.firebaseDb = db;
 
-        console.log('Firebase initialized successfully');
+      // Firestore関数もグローバルに公開
+      window.firestore = {
+        collection,
+        doc,
+        addDoc,
+        setDoc,
+        updateDoc,
+        deleteDoc,
+        getDocs,
+        getDoc,
+        query,
+        orderBy,
+      };
+
+      // Firebase Auth関数もグローバルに公開
+      window.firebaseAuthFunctions = {
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      };
+
+      console.log("Firebase initialized successfully");
     </script>
 
     <script src="books-data.js"></script>
     <script src="app.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <!-- ヘッダー: アプリのタイトルとナビゲーション -->
     <header id="app-header" role="banner">
-        <div class="header-content">
-            <h1 id="app-title">
-                <span class="visually-hidden">私の</span>
-                〇〇本棚
-            </h1>
-            <!-- 管理モード切り替えボタン -->
-            <nav class="admin-controls" aria-label="管理モード切り替え">
-                <button
-                    id="admin-mode-btn"
-                    class="admin-button"
-                    aria-label="管理モードに切り替え"
-                    type="button">
-                    管理
-                </button>
-                <button
-                    id="normal-mode-btn"
-                    class="admin-button"
-                    style="display: none;"
-                    aria-label="通常モードに切り替え"
-                    type="button">
-                    通常
-                </button>
-            </nav>
-        </div>
+      <div class="header-content">
+        <h1 id="app-title">
+          <span class="visually-hidden">私の</span>
+          〇〇本棚
+        </h1>
+        <!-- 管理モード切り替えボタン -->
+        <nav class="admin-controls" aria-label="管理モード切り替え">
+          <button
+            id="admin-mode-btn"
+            class="admin-button"
+            aria-label="管理モードに切り替え"
+            type="button"
+          >
+            管理
+          </button>
+          <button
+            id="normal-mode-btn"
+            class="admin-button"
+            style="display: none"
+            aria-label="通常モードに切り替え"
+            type="button"
+          >
+            通常
+          </button>
+        </nav>
+      </div>
     </header>
 
     <!-- メインコンテナ -->
     <main id="main-content" role="main">
-        <!-- SC1: 一覧画面 -->
-        <section id="screen-list" class="screen" aria-labelledby="book-list-heading">
-            <h2 id="book-list-heading" class="visually-hidden">本の一覧</h2>
+      <!-- SC1: 一覧画面 -->
+      <section
+        id="screen-list"
+        class="screen"
+        aria-labelledby="book-list-heading"
+      >
+        <h2 id="book-list-heading" class="visually-hidden">本の一覧</h2>
 
-            <!-- 検索・フィルター機能（管理モード時のみ表示） -->
-            <div id="search-controls" class="search-controls" style="display: none;" role="search" aria-label="本を検索">
-                <label for="search-input" class="visually-hidden">本を検索</label>
-                <input
-                    type="search"
-                    id="search-input"
-                    placeholder="本を検索..."
-                    class="search-input"
-                    aria-describedby="search-hint">
-                <span id="search-hint" class="visually-hidden">タイトルまたは著者名で検索できます</span>
+        <!-- 検索・フィルター機能（管理モード時のみ表示） -->
+        <div
+          id="search-controls"
+          class="search-controls"
+          style="display: none"
+          role="search"
+          aria-label="本を検索"
+        >
+          <label for="search-input" class="visually-hidden">本を検索</label>
+          <input
+            type="search"
+            id="search-input"
+            placeholder="本を検索..."
+            class="search-input"
+            aria-describedby="search-hint"
+          />
+          <span id="search-hint" class="visually-hidden"
+            >タイトルまたは著者名で検索できます</span
+          >
 
-                <label for="author-filter" class="visually-hidden">著者で絞り込み</label>
-                <select id="author-filter" class="author-filter" aria-label="著者で絞り込み">
-                    <option value="">すべての著者</option>
-                </select>
+          <label for="author-filter" class="visually-hidden"
+            >著者で絞り込み</label
+          >
+          <select
+            id="author-filter"
+            class="author-filter"
+            aria-label="著者で絞り込み"
+          >
+            <option value="">すべての著者</option>
+          </select>
 
-                <button
-                    id="add-book-btn"
-                    class="add-book-button"
-                    type="button"
-                    aria-label="新しい本を追加">
-                    <span aria-hidden="true">+</span> 新規追加
-                </button>
-            </div>
+          <button
+            id="add-book-btn"
+            class="add-book-button"
+            type="button"
+            aria-label="新しい本を追加"
+          >
+            <span aria-hidden="true">+</span> 新規追加
+          </button>
+        </div>
 
-            <div id="book-list" role="list" aria-live="polite" aria-atomic="false"></div>
-        </section>
+        <div
+          id="book-list"
+          role="list"
+          aria-live="polite"
+          aria-atomic="false"
+        ></div>
+      </section>
 
-        <!-- SC2: 詳細画面 -->
-        <section id="screen-detail" class="screen" style="display: none;" aria-labelledby="detail-heading">
-            <button
-                id="back-btn"
-                class="back-button"
-                type="button"
-                aria-label="一覧に戻る">
-                <span aria-hidden="true">←</span> 戻る
-            </button>
-            <div id="book-detail-content" role="article">
-                <!-- ここに本の詳細が動的に表示されます -->
-            </div>
-        </section>
+      <!-- SC2: 詳細画面 -->
+      <section
+        id="screen-detail"
+        class="screen"
+        style="display: none"
+        aria-labelledby="detail-heading"
+      >
+        <button
+          id="back-btn"
+          class="back-button"
+          type="button"
+          aria-label="一覧に戻る"
+        >
+          <span aria-hidden="true">←</span> 戻る
+        </button>
+        <div id="book-detail-content" role="article">
+          <!-- ここに本の詳細が動的に表示されます -->
+        </div>
+      </section>
 
-        <!-- SC3: 追加・編集画面（管理モード時のみ表示） -->
-        <section id="screen-edit" class="screen" style="display: none;" aria-labelledby="edit-heading">
-            <button
-                id="back-edit-btn"
-                class="back-button"
-                type="button"
-                aria-label="一覧に戻る">
-                <span aria-hidden="true">←</span> 一覧に戻る
-            </button>
-            <div id="book-edit-content">
-                <!-- ここに本の追加・編集フォームが動的に表示されます -->
-            </div>
-        </section>
+      <!-- SC3: 追加・編集画面（管理モード時のみ表示） -->
+      <section
+        id="screen-edit"
+        class="screen"
+        style="display: none"
+        aria-labelledby="edit-heading"
+      >
+        <button
+          id="back-edit-btn"
+          class="back-button"
+          type="button"
+          aria-label="一覧に戻る"
+        >
+          <span aria-hidden="true">←</span> 一覧に戻る
+        </button>
+        <div id="book-edit-content">
+          <!-- ここに本の追加・編集フォームが動的に表示されます -->
+        </div>
+      </section>
     </main>
 
     <!-- 認証モーダル -->
     <div
-        id="auth-modal"
-        class="modal"
-        style="display: none;"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="auth-modal-title">
-        <div class="modal-overlay" aria-hidden="true"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="auth-modal-title">管理モード認証</h2>
-                <button
-                    id="close-auth-modal-x"
-                    class="close-x"
-                    type="button"
-                    aria-label="認証モーダルを閉じる">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <form class="auth-form" onsubmit="return false;">
-                <label for="auth-email" class="visually-hidden">メールアドレス</label>
-                <input
-                    type="email"
-                    id="auth-email"
-                    placeholder="メールアドレス"
-                    class="auth-input"
-                    required
-                    autocomplete="email"
-                    aria-required="true">
-
-                <label for="auth-password" class="visually-hidden">パスワード</label>
-                <input
-                    type="password"
-                    id="auth-password"
-                    placeholder="パスワード"
-                    class="auth-input"
-                    required
-                    autocomplete="current-password"
-                    aria-required="true">
-
-                <button
-                    id="auth-login-btn"
-                    class="auth-button"
-                    type="submit"
-                    aria-label="ログイン">
-                    ログイン
-                </button>
-            </form>
-            <div class="modal-buttons">
-                <button
-                    id="close-auth-modal-btn"
-                    class="close-button"
-                    type="button">
-                    キャンセル
-                </button>
-            </div>
+      id="auth-modal"
+      class="modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="auth-modal-title">管理モード認証</h2>
+          <button
+            id="close-auth-modal-x"
+            class="close-x"
+            type="button"
+            aria-label="認証モーダルを閉じる"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
+        <form class="auth-form" onsubmit="return false;">
+          <label for="auth-email" class="visually-hidden">メールアドレス</label>
+          <input
+            type="email"
+            id="auth-email"
+            placeholder="メールアドレス"
+            class="auth-input"
+            required
+            autocomplete="email"
+            aria-required="true"
+          />
+
+          <label for="auth-password" class="visually-hidden">パスワード</label>
+          <input
+            type="password"
+            id="auth-password"
+            placeholder="パスワード"
+            class="auth-input"
+            required
+            autocomplete="current-password"
+            aria-required="true"
+          />
+
+          <button
+            id="auth-login-btn"
+            class="auth-button"
+            type="submit"
+            aria-label="ログイン"
+          >
+            ログイン
+          </button>
+        </form>
+        <div class="modal-buttons">
+          <button id="close-auth-modal-btn" class="close-button" type="button">
+            キャンセル
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- プロンプト表示モーダル -->
     <div
-        id="prompt-modal"
-        class="modal"
-        style="display: none;"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="prompt-modal-title">
-        <div class="modal-overlay" aria-hidden="true"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="prompt-modal-title">上司と対話するプロンプト</h2>
-                <button
-                    id="close-modal-x"
-                    class="close-x"
-                    type="button"
-                    aria-label="プロンプトモーダルを閉じる">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <label for="prompt-text" class="visually-hidden">プロンプトテキスト</label>
-            <textarea
-                id="prompt-text"
-                class="prompt-textarea"
-                readonly
-                aria-label="生成されたプロンプトテキスト"
-                aria-describedby="prompt-description"></textarea>
-            <p id="prompt-description" class="visually-hidden">このテキストをコピーしてAIチャットで使用できます</p>
-            <div class="modal-buttons">
-                <button
-                    id="copy-btn"
-                    class="copy-button"
-                    type="button"
-                    aria-label="プロンプトをクリップボードにコピー">
-                    <span aria-hidden="true">📋</span> コピー
-                </button>
-                <button
-                    id="close-modal-btn"
-                    class="close-button"
-                    type="button">
-                    閉じる
-                </button>
-            </div>
+      id="prompt-modal"
+      class="modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="prompt-modal-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="prompt-modal-title">上司と対話するプロンプト</h2>
+          <button
+            id="close-modal-x"
+            class="close-x"
+            type="button"
+            aria-label="プロンプトモーダルを閉じる"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
+        <label for="prompt-text" class="visually-hidden"
+          >プロンプトテキスト</label
+        >
+        <textarea
+          id="prompt-text"
+          class="prompt-textarea"
+          readonly
+          aria-label="生成されたプロンプトテキスト"
+          aria-describedby="prompt-description"
+        ></textarea>
+        <p id="prompt-description" class="visually-hidden">
+          このテキストをコピーしてAIチャットで使用できます
+        </p>
+        <div class="modal-buttons">
+          <button
+            id="copy-btn"
+            class="copy-button"
+            type="button"
+            aria-label="プロンプトをクリップボードにコピー"
+          >
+            <span aria-hidden="true">📋</span> コピー
+          </button>
+          <button id="close-modal-btn" class="close-button" type="button">
+            閉じる
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- コピー成功モーダル -->
     <div
-        id="copy-success-modal"
-        class="modal copy-success-modal"
-        style="display: none;"
-        role="alert"
-        aria-live="assertive"
-        aria-labelledby="copy-success-title">
-        <div class="modal-overlay" aria-hidden="true"></div>
-        <div class="modal-content copy-success-content">
-            <div class="modal-header copy-success-header">
-                <h2 id="copy-success-title">
-                    <span aria-hidden="true">✨</span> コピー完了
-                </h2>
-                <button
-                    id="close-copy-success-x"
-                    class="close-x"
-                    type="button"
-                    aria-label="通知を閉じる">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="copy-success-message">
-                <p>コピーしました。AIに読み込ませて対話しましょう</p>
-            </div>
-            <div class="modal-buttons">
-                <button
-                    id="close-copy-success-btn"
-                    class="close-button"
-                    type="button">
-                    閉じる
-                </button>
-            </div>
+      id="copy-success-modal"
+      class="modal copy-success-modal"
+      style="display: none"
+      role="alert"
+      aria-live="assertive"
+      aria-labelledby="copy-success-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content copy-success-content">
+        <div class="modal-header copy-success-header">
+          <h2 id="copy-success-title">
+            <span aria-hidden="true">✨</span> コピー完了
+          </h2>
+          <button
+            id="close-copy-success-x"
+            class="close-x"
+            type="button"
+            aria-label="通知を閉じる"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
         </div>
+        <div class="copy-success-message">
+          <p>コピーしました。AIに読み込ませて対話しましょう</p>
+        </div>
+        <div class="modal-buttons">
+          <button
+            id="close-copy-success-btn"
+            class="close-button"
+            type="button"
+          >
+            閉じる
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 閲覧パスワードモーダル -->
     <div
-        id="view-password-modal"
-        class="modal"
-        style="display: none;"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="view-password-title">
-        <div class="modal-overlay" aria-hidden="true"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="view-password-title">パスワードを入力してください</h2>
-            </div>
-            <form class="auth-form" id="view-password-form" onsubmit="return false;">
-                <label for="view-password-input" class="visually-hidden">パスワード</label>
-                <input
-                    type="password"
-                    id="view-password-input"
-                    placeholder="パスワード"
-                    class="auth-input"
-                    required
-                    autocomplete="off"
-                    aria-required="true">
-                <div id="view-password-error" style="color: #f5576c; margin-top: 0.5rem; display: none;">
-                    パスワードが正しくありません
-                </div>
-                <button
-                    id="view-password-btn"
-                    class="auth-button"
-                    type="submit"
-                    aria-label="パスワードを確認">
-                    確認
-                </button>
-            </form>
+      id="view-password-modal"
+      class="modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="view-password-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="view-password-title">パスワードを入力してください</h2>
         </div>
+        <form
+          class="auth-form"
+          id="view-password-form"
+          onsubmit="return false;"
+        >
+          <label for="view-password-input" class="visually-hidden"
+            >パスワード</label
+          >
+          <input
+            type="password"
+            id="view-password-input"
+            placeholder="パスワード"
+            class="auth-input"
+            required
+            autocomplete="off"
+            aria-required="true"
+          />
+          <div
+            id="view-password-error"
+            style="color: #f5576c; margin-top: 0.5rem; display: none"
+          >
+            パスワードが正しくありません
+          </div>
+          <button
+            id="view-password-btn"
+            class="auth-button"
+            type="submit"
+            aria-label="パスワードを確認"
+          >
+            確認
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- AIチャットモーダル -->
+    <div
+      id="chat-modal"
+      class="modal chat-modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-modal-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content chat-modal-content">
+        <div class="modal-header">
+          <h2 id="chat-modal-title">AI読書パートナーと対話</h2>
+          <button
+            id="close-chat-modal-x"
+            class="close-x"
+            type="button"
+            aria-label="チャットを閉じる"
+          >
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="chat-container">
+          <iframe
+            id="dify-chat-iframe"
+            src=""
+            style="width: 100%; height: 100%; border: none"
+            allow="microphone"
+          >
+          </iframe>
+        </div>
+        <div class="modal-buttons">
+          <button id="close-chat-modal-btn" class="close-button" type="button">
+            閉じる
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Status messages for screen reader announcements -->
-    <div role="status" aria-live="polite" aria-atomic="true" class="visually-hidden" id="status-message"></div>
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      class="visually-hidden"
+      id="status-message"
+    ></div>
 
     <!-- ローディングインジケーター -->
-    <div id="loading-indicator" class="loading-overlay" style="display: none;" role="status" aria-live="polite">
-        <div class="loading-spinner">
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <div class="spinner-ring"></div>
-            <p class="loading-text">読み込み中...</p>
-        </div>
+    <div
+      id="loading-indicator"
+      class="loading-overlay"
+      style="display: none"
+      role="status"
+      aria-live="polite"
+    >
+      <div class="loading-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <p class="loading-text">読み込み中...</p>
+      </div>
     </div>
 
     <!-- トースト通知コンテナ -->
-    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-</body>
+    <div
+      id="toast-container"
+      class="toast-container"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+  </body>
 </html>
-
