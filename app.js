@@ -1164,6 +1164,26 @@ function removeToast(toastId) {
   }
 }
 
+// Dify inputs をGZIP圧縮 + Base64エンコード (embed.jsと同じ処理)
+function encodeDifyInputs(inputs) {
+    try {
+        // JSON文字列に変換
+        const jsonString = JSON.stringify(inputs);
+        
+        // GZIP圧縮
+        const compressed = pako.gzip(jsonString);
+        
+        // Base64エンコード
+        const base64 = btoa(String.fromCharCode.apply(null, compressed));
+        
+        // URLエンコード
+        return encodeURIComponent(base64);
+    } catch (error) {
+        console.error('Failed to encode Dify inputs:', error);
+        return null;
+    }
+}
+
 // チャット機能
 function openChat(bookId) {
     const book = booksData.find(b => b.id === bookId);
@@ -1191,16 +1211,40 @@ function openChat(bookId) {
 
     const fullContentForCopy = baseInfo + summaryText + introText + quotesText + reflectionsText + keywordsText;
 
-    // DifyチャットボットのURL
-    const difyUrl = 'https://udify.app/chatbot/7K7Ymm1N7MfjS6e1';
-    
-    console.log('Opening Dify chatbot for book:', book.title);
-    console.log('📋 Use "本の情報をコピー" button to share book info with the chatbot');
+    // Dify用のコンテンツ（簡潔版 - 要約と導入のみ）
+    const difyContent = `${book.summary || ''}\n\n${book.introduction || book.description || ''}`.trim();
 
-    // iframeにDifyのURLを設定
+    // Difyに渡す変数
+    const inputs = {
+        book_title: book.title,
+        book_author: book.author,
+        book_content: difyContent
+    };
+    
+    // inputs をGZIP圧縮 + Base64エンコード
+    const encodedInputs = encodeDifyInputs(inputs);
+    
+    // DifyチャットボットのURL
+    let difyUrl = 'https://udify.app/chatbot/7K7Ymm1N7MfjS6e1';
+    
+    if (encodedInputs) {
+        // エンコード成功: URLにinputsパラメータを追加
+        difyUrl += `?inputs=${encodedInputs}`;
+        console.log('✅ Opening Dify chatbot with auto-filled book info:');
+        console.log('  📖 Title:', book.title);
+        console.log('  ✍️  Author:', book.author);
+        console.log('  📝 Content preview:', difyContent.substring(0, 50) + '...');
+        console.log('  🔗 Encoded URL length:', difyUrl.length);
+    } else {
+        // エンコード失敗: 通常のURLを使用
+        console.warn('⚠️ Failed to encode inputs. Opening Dify without pre-filled data.');
+        console.log('💡 Use "本の情報をコピー" button to share book info with the chatbot.');
+    }
+
+    // iframeにURLを設定
     iframe.src = difyUrl;
     
-    // コピーボタンにデータを紐付け
+    // コピーボタンにデータを紐付け（フォールバック用）
     const copyBtn = document.getElementById('chat-copy-info-btn');
     if (copyBtn) {
         const originalText = '<span aria-hidden="true">📋</span> 本の情報をコピー';
