@@ -247,8 +247,14 @@ function setupEventListeners() {
     ?.addEventListener("click", handleLogin);
 
   // 画面遷移
+  // 画面遷移
   document.getElementById("back-btn")?.addEventListener("click", () => {
-    window.history.back();
+    // 履歴があれば戻る、なければリストに戻る（安全策）
+    if (window.history.state && window.history.state.screen === 'detail') {
+        window.history.back();
+    } else {
+        showScreen('list');
+    }
   });
   document.getElementById("back-edit-btn")?.addEventListener("click", () => {
     window.history.back();
@@ -1159,6 +1165,27 @@ function removeToast(toastId) {
 }
 
 // チャット機能
+
+
+// URLのバイト数制限を考慮してテキストを切り詰める関数
+function truncateTextForUrl(text, maxBytes = 1000) {
+    if (!text) return '';
+    
+    // URLエンコード後のサイズを概算
+    // 日本語は1文字で9バイト以上になることがあるため、安全マージンをとる
+    let truncated = text;
+    let encoded = encodeURIComponent(truncated);
+    
+    while (encoded.length > maxBytes && truncated.length > 0) {
+        // 末尾から少しずつ削る
+        truncated = truncated.slice(0, -10); // 10文字ずつ削除して高速化
+        encoded = encodeURIComponent(truncated);
+    }
+    
+    return truncated + (text.length > truncated.length ? '...' : '');
+}
+
+// チャット機能
 function openChat(bookId) {
     const book = booksData.find(b => b.id === bookId);
     if (!book) return;
@@ -1166,36 +1193,35 @@ function openChat(bookId) {
     const iframe = document.getElementById('dify-chat-iframe');
     const modal = document.getElementById('chat-modal');
 
-    // URLの長さ制限（約2000文字）を考慮してコンテンツを構築
-    // 優先度: 基本情報 > 要約 > 引用/考察
-    
-    const MAX_CONTENT_LENGTH = 1500; // 安全マージンを取って1500文字制限
-
-    // 引用・考察は最大3つまでに制限
-    const limitedQuotes = (book.quotes || []).slice(0, 3);
-    const limitedReflections = (book.reflections || []).slice(0, 3);
+    // 引用・考察は最大2つまでに制限
+    const limitedQuotes = (book.quotes || []).slice(0, 2);
+    const limitedReflections = (book.reflections || []).slice(0, 2);
 
     const quotesText = limitedQuotes.map(q => `・${q.title}\n  "${q.content}"`).join('\n');
     const reflectionsText = limitedReflections.map(r => `・${r.title}\n  ${r.content}`).join('\n');
 
-    let content = [
-        `【導入・紹介】\n${book.introduction || book.description || 'なし'}`,
-        `【要約】\n${book.summary || 'なし'}`,
-        `【引用(一部)】\n${quotesText || 'なし'}`,
-        `【考察(一部)】\n${reflectionsText || book.insights || book.review || 'なし'}`,
-        `【キーワード】\n${(book.keywords || []).join(', ')}`
-    ].join('\n\n');
+    // コンテンツの優先順位付け
+    // 1. 基本情報（タイトル・著者）はDifyの別変数なのでここでは考慮しない
+    // 2. 導入・要約を優先
+    let contentBase = `【導入・紹介】\n${book.introduction || book.description || 'なし'}\n\n【要約】\n${book.summary || 'なし'}`;
+    
+    // 3. 引用・考察・キーワードを追加（容量が許す限り）
+    let contentExtras = `\n\n【引用(一部)】\n${quotesText || 'なし'}\n\n【考察(一部)】\n${reflectionsText || book.insights || book.review || 'なし'}\n\n【キーワード】\n${(book.keywords || []).join(', ')}`;
 
-    // 全体の長さが制限を超えていたら切り詰める
-    if (content.length > MAX_CONTENT_LENGTH) {
-        content = content.substring(0, MAX_CONTENT_LENGTH) + '\n...(文字数制限のため以降省略)';
-    }
+    // 全体を結合
+    let fullContent = contentBase + contentExtras;
+
+    // 厳格なサイズ制限 (URL全体で2000文字程度が上限。ベースURLや他パラメータを除き、コンテンツには約1000バイト〜1500バイト程度を割り当て)
+    // encodeURIComponent後の長さで判定
+    const SAFE_ENCODED_LIMIT = 1200; 
+
+    const truncatedContent = truncateTextForUrl(fullContent, SAFE_ENCODED_LIMIT);
 
     // Difyに渡す変数を作成
     const inputs = {
         book_title: book.title,
         book_author: book.author,
-        book_content: content
+        book_content: truncatedContent
     };
 
     // URLパラメータとして変数を付与
