@@ -1166,21 +1166,30 @@ function openChat(bookId) {
     const iframe = document.getElementById('dify-chat-iframe');
     const modal = document.getElementById('chat-modal');
 
-    // 引用をテキスト化
-    const quotesText = (book.quotes || []).map(q => `・${q.title}\n  "${q.content}" (p.${q.pageNumber})`).join('\n\n');
+    // URLの長さ制限（約2000文字）を考慮してコンテンツを構築
+    // 優先度: 基本情報 > 要約 > 引用/考察
     
-    // 考察をテキスト化
-    const reflectionsText = (book.reflections || []).map(r => `・${r.title}\n  ${r.content}`).join('\n\n');
+    const MAX_CONTENT_LENGTH = 1500; // 安全マージンを取って1500文字制限
 
-    // Difyに渡すコンテキストを作成
-    // reviewやinsightsなどの古いフィールドだけでなく、新しい構造（introduction, summary, quotes, reflections）も考慮
-    const content = [
+    // 引用・考察は最大3つまでに制限
+    const limitedQuotes = (book.quotes || []).slice(0, 3);
+    const limitedReflections = (book.reflections || []).slice(0, 3);
+
+    const quotesText = limitedQuotes.map(q => `・${q.title}\n  "${q.content}"`).join('\n');
+    const reflectionsText = limitedReflections.map(r => `・${r.title}\n  ${r.content}`).join('\n');
+
+    let content = [
         `【導入・紹介】\n${book.introduction || book.description || 'なし'}`,
         `【要約】\n${book.summary || 'なし'}`,
-        `【引用】\n${quotesText || 'なし'}`,
-        `【考察】\n${reflectionsText || book.insights || book.review || 'なし'}`,
+        `【引用(一部)】\n${quotesText || 'なし'}`,
+        `【考察(一部)】\n${reflectionsText || book.insights || book.review || 'なし'}`,
         `【キーワード】\n${(book.keywords || []).join(', ')}`
     ].join('\n\n');
+
+    // 全体の長さが制限を超えていたら切り詰める
+    if (content.length > MAX_CONTENT_LENGTH) {
+        content = content.substring(0, MAX_CONTENT_LENGTH) + '\n...(文字数制限のため以降省略)';
+    }
 
     // Difyに渡す変数を作成
     const inputs = {
