@@ -427,7 +427,10 @@
       <div class="modal-overlay" aria-hidden="true"></div>
       <div class="modal-content chat-modal-content">
         <div class="modal-header">
-          <h2 id="chat-modal-title">AI読書パートナーと対話</h2>
+          <div>
+            <h2 id="chat-modal-title" style="margin-bottom: 0.25rem; font-size: 1.25rem;">AI読書パートナー</h2>
+            <p id="chat-modal-book-title" style="font-size: 0.9rem; opacity: 0.9; font-weight: normal;">本を選択中...</p>
+          </div>
           <button
             id="close-chat-modal-x"
             class="close-x"
@@ -446,7 +449,10 @@
           >
           </iframe>
         </div>
-        <div class="modal-buttons">
+        <div class="modal-footer">
+           <button id="chat-copy-info-btn" class="copy-button" type="button" style="margin-right: auto;">
+            <span aria-hidden="true">📋</span> 本の情報をコピー
+          </button>
           <button id="close-chat-modal-btn" class="close-button" type="button">
             閉じる
           </button>

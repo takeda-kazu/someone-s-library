@@ -1168,17 +1168,18 @@ function removeToast(toastId) {
 
 
 // URLのバイト数制限を考慮してテキストを切り詰める関数
-function truncateTextForUrl(text, maxBytes = 1000) {
+function truncateTextForUrl(text, maxBytes = 1500) {
     if (!text) return '';
     
     // URLエンコード後のサイズを概算
-    // 日本語は1文字で9バイト以上になることがあるため、安全マージンをとる
     let truncated = text;
     let encoded = encodeURIComponent(truncated);
     
+    // 安全マージンを確保しながら切り詰め
     while (encoded.length > maxBytes && truncated.length > 0) {
         // 末尾から少しずつ削る
-        truncated = truncated.slice(0, -10); // 10文字ずつ削除して高速化
+        const cutLength = Math.max(1, Math.floor((encoded.length - maxBytes) / 3));
+        truncated = truncated.slice(0, -cutLength);
         encoded = encodeURIComponent(truncated);
     }
     
@@ -1192,6 +1193,12 @@ function openChat(bookId) {
 
     const iframe = document.getElementById('dify-chat-iframe');
     const modal = document.getElementById('chat-modal');
+    
+    // モーダル内のタイトルを設定（もし要素があれば）
+    const modalTitle = document.getElementById('chat-modal-book-title');
+    if (modalTitle) {
+        modalTitle.textContent = book.title;
+    }
 
     // 引用・考察は最大2つまでに制限
     const limitedQuotes = (book.quotes || []).slice(0, 2);
@@ -1213,7 +1220,7 @@ function openChat(bookId) {
 
     // 厳格なサイズ制限 (URL全体で2000文字程度が上限。ベースURLや他パラメータを除き、コンテンツには約1000バイト〜1500バイト程度を割り当て)
     // encodeURIComponent後の長さで判定
-    const SAFE_ENCODED_LIMIT = 1200; 
+    const SAFE_ENCODED_LIMIT = 1500; 
 
     const truncatedContent = truncateTextForUrl(fullContent, SAFE_ENCODED_LIMIT);
 
@@ -1230,6 +1237,13 @@ function openChat(bookId) {
     const src = `${baseUrl}?inputs=${encodeURIComponent(inputsJson)}`;
 
     iframe.src = src;
+    
+    // コピーボタンにデータを紐付け
+    const copyBtn = document.getElementById('chat-copy-info-btn');
+    if (copyBtn) {
+        copyBtn.onclick = () => copyBookInfo(book, fullContent);
+    }
+    
     modal.style.display = 'flex';
 }
 
@@ -1240,4 +1254,17 @@ function closeChatModal() {
     modal.style.display = 'none';
     // チャットをリセットするためにsrcを空にする（次回開くときに再読み込みされる）
     iframe.src = '';
+}
+
+// 本の情報をクリップボードにコピー（バックアップ用）
+async function copyBookInfo(book, fullContent) {
+    const textToCopy = `書籍名: ${book.title}\n著者: ${book.author}\n\n${fullContent}`;
+    
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        showToast("本の情報をコピーしました。チャットに貼り付けてください。", "success");
+    } catch (error) {
+        console.error("コピー失敗:", error);
+        showToast("コピーに失敗しました", "error");
+    }
 }
