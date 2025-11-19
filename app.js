@@ -1165,83 +1165,58 @@ function removeToast(toastId) {
 }
 
 // チャット機能
-
-
-// URLのバイト数制限を考慮してテキストを切り詰める関数
-function truncateTextForUrl(text, maxBytes = 1500) {
-    if (!text) return '';
-    
-    // URLエンコード後のサイズを概算
-    let truncated = text;
-    let encoded = encodeURIComponent(truncated);
-    
-    // 安全マージンを確保しながら切り詰め
-    while (encoded.length > maxBytes && truncated.length > 0) {
-        // 末尾から少しずつ削る
-        const cutLength = Math.max(1, Math.floor((encoded.length - maxBytes) / 3));
-        truncated = truncated.slice(0, -cutLength);
-        encoded = encodeURIComponent(truncated);
-    }
-    
-    return truncated + (text.length > truncated.length ? '...' : '');
-}
-
-// チャット機能
 function openChat(bookId) {
     const book = booksData.find(b => b.id === bookId);
     if (!book) return;
 
-    const iframe = document.getElementById('dify-chat-iframe');
+    const iframe = document.getElementById('dify-chatbot-iframe');
     const modal = document.getElementById('chat-modal');
     
-    // モーダル内のタイトルを設定（もし要素があれば）
+    // モーダル内のタイトルを設定
     const modalTitle = document.getElementById('chat-modal-book-title');
     if (modalTitle) {
         modalTitle.textContent = book.title;
     }
 
-    // 引用・考察は最大2つまでに制限
-    const limitedQuotes = (book.quotes || []).slice(0, 2);
-    const limitedReflections = (book.reflections || []).slice(0, 2);
-
-    const quotesText = limitedQuotes.map(q => `・${q.title}\n  "${q.content}"`).join('\n');
-    const reflectionsText = limitedReflections.map(r => `・${r.title}\n  ${r.content}`).join('\n');
-
-    // コンテンツの優先順位付け
-    // 1. 基本情報（タイトル・著者）はDifyの別変数なのでここでは考慮しない
-    // 2. 導入・要約を優先
-    let contentBase = `【導入・紹介】\n${book.introduction || book.description || 'なし'}\n\n【要約】\n${book.summary || 'なし'}`;
+    // コンテンツの構築（コピー用に完全版を保持）
+    const baseInfo = `【タイトル】${book.title}\n【著者】${book.author}\n`;
+    const summaryText = `\n【要約】\n${book.summary || 'なし'}`;
+    const introText = `\n\n【導入・紹介】\n${book.introduction || book.description || 'なし'}`;
     
-    // 3. 引用・考察・キーワードを追加（容量が許す限り）
-    let contentExtras = `\n\n【引用(一部)】\n${quotesText || 'なし'}\n\n【考察(一部)】\n${reflectionsText || book.insights || book.review || 'なし'}\n\n【キーワード】\n${(book.keywords || []).join(', ')}`;
+    const limitedQuotes = (book.quotes || []).slice(0, 3);
+    const limitedReflections = (book.reflections || []).slice(0, 3);
+    const quotesText = limitedQuotes.length > 0 ? `\n\n【引用(一部)】\n` + limitedQuotes.map(q => `・${q.title}\n  "${q.content}"`).join('\n') : '';
+    const reflectionsText = limitedReflections.length > 0 ? `\n\n【考察(一部)】\n` + limitedReflections.map(r => `・${r.title}\n  ${r.content}`).join('\n') : '';
+    const keywordsText = (book.keywords && book.keywords.length > 0) ? `\n\n【キーワード】\n${book.keywords.join(', ')}` : '';
 
-    // 全体を結合
-    let fullContent = contentBase + contentExtras;
+    const fullContentForCopy = baseInfo + summaryText + introText + quotesText + reflectionsText + keywordsText;
 
-    // 厳格なサイズ制限 (URL全体で2000文字程度が上限。ベースURLや他パラメータを除き、コンテンツには約1000バイト〜1500バイト程度を割り当て)
-    // encodeURIComponent後の長さで判定
-    const SAFE_ENCODED_LIMIT = 1500; 
+    // DifyチャットボットのURL
+    const difyUrl = 'https://udify.app/chatbot/7K7Ymm1N7MfjS6e1';
+    
+    console.log('Opening Dify chatbot for book:', book.title);
+    console.log('📋 Use "本の情報をコピー" button to share book info with the chatbot');
 
-    const truncatedContent = truncateTextForUrl(fullContent, SAFE_ENCODED_LIMIT);
-
-    // Difyに渡す変数を作成
-    const inputs = {
-        book_title: book.title,
-        book_author: book.author,
-        book_content: truncatedContent
-    };
-
-    // URLパラメータとして変数を付与
-    const baseUrl = 'https://udify.app/chatbot/7K7Ymm1N7MfjS6e1';
-    const inputsJson = JSON.stringify(inputs);
-    const src = `${baseUrl}?inputs=${encodeURIComponent(inputsJson)}`;
-
-    iframe.src = src;
+    // iframeにDifyのURLを設定
+    iframe.src = difyUrl;
     
     // コピーボタンにデータを紐付け
     const copyBtn = document.getElementById('chat-copy-info-btn');
     if (copyBtn) {
-        copyBtn.onclick = () => copyBookInfo(book, fullContent);
+        const originalText = '<span aria-hidden="true">📋</span> 本の情報をコピー';
+        copyBtn.innerHTML = originalText;
+        copyBtn.classList.remove('copied');
+        
+        copyBtn.onclick = () => {
+            copyBookInfo(book, fullContentForCopy);
+            
+            copyBtn.innerHTML = '<span aria-hidden="true">✓</span> コピーしました';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        };
     }
     
     modal.style.display = 'flex';
@@ -1249,10 +1224,11 @@ function openChat(bookId) {
 
 function closeChatModal() {
     const modal = document.getElementById('chat-modal');
-    const iframe = document.getElementById('dify-chat-iframe');
+    const iframe = document.getElementById('dify-chatbot-iframe');
     
     modal.style.display = 'none';
-    // チャットをリセットするためにsrcを空にする（次回開くときに再読み込みされる）
+    
+    // iframeをリセット（次回開くときに再読み込み）
     iframe.src = '';
 }
 
