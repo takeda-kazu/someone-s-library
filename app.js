@@ -11,10 +11,12 @@ const VIEW_PASSWORD = "teijin";
 // DOM読み込み後に実行
 document.addEventListener("DOMContentLoaded", () => {
   console.log("App initialized");
-  checkViewPassword();
+  // 閲覧パスワードチェックをスキップして直接初期化
+  initializeApp();
 });
 
-// 閲覧パスワードチェック
+// 閲覧パスワードチェック (無効化)
+/*
 function checkViewPassword() {
   // セッションストレージでパスワード検証済みかチェック
   const verified = sessionStorage.getItem("viewPasswordVerified");
@@ -27,6 +29,7 @@ function checkViewPassword() {
     showViewPasswordModal();
   }
 }
+*/
 
 // 閲覧パスワードモーダルを表示
 function showViewPasswordModal() {
@@ -328,20 +331,20 @@ function createBookCard(book) {
   card.onclick = () => showBookDetail(book.id);
 
   const imageHtml = book.imageUrl
-    ? `<img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(
+    ? `<div class="book-card-image-wrapper"><img src="${escapeHtml(book.imageUrl)}" alt="${escapeHtml(
         book.title
-      )}の表紙" class="book-image" onerror="this.style.display='none'">`
-    : "";
+      )}の表紙" class="book-card-image" onerror="this.style.display='none'"></div>`
+    : `<div class="book-card-image-wrapper" style="background: linear-gradient(135deg, #333 0%, #444 100%); display: flex; align-items: center; justify-content: center;"><span style="font-size: 2rem;">📚</span></div>`;
 
   card.innerHTML = `
-        <div class="book-card-header">
-            <h3 class="book-title">${escapeHtml(book.title)}</h3>
-            <p class="book-author">著者: ${escapeHtml(book.author)}</p>
-        </div>
         ${imageHtml}
-        <p class="book-description">${escapeHtml(
-          book.introduction || book.description || ""
-        )}</p>
+        <div class="book-card-content">
+            <h3 class="book-card-title">${escapeHtml(book.title)}</h3>
+            <p class="book-card-author">${escapeHtml(book.author)}</p>
+            <p class="book-description" style="font-size: 13px; color: var(--text-tertiary); margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(
+              book.introduction || book.description || ""
+            )}</p>
+        </div>
     `;
 
   return card;

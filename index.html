@@ -88,42 +88,47 @@
     <script src="app.js"></script>
   </head>
   <body>
+    <!-- 背景エフェクト用要素 -->
+    <div class="ambient-background"></div>
+
     <!-- ヘッダー: アプリのタイトルとナビゲーション -->
-    <header id="app-header" role="banner">
+    <header id="app-header" role="banner" class="glass-header">
       <div class="header-content">
         <h1 id="app-title">
           <span class="visually-hidden">私の</span>
-          〇〇本棚
+          Library Watch
         </h1>
         <!-- 管理モード切り替えボタン -->
         <nav class="admin-controls" aria-label="管理モード切り替え">
           <button
             id="admin-mode-btn"
-            class="admin-button"
+            class="icon-button"
             aria-label="管理モードに切り替え"
             type="button"
+            title="管理モード"
           >
-            管理
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
           <button
             id="normal-mode-btn"
-            class="admin-button"
+            class="icon-button active"
             style="display: none"
             aria-label="通常モードに切り替え"
             type="button"
+            title="通常モード"
           >
-            通常
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           </button>
         </nav>
       </div>
     </header>
 
     <!-- メインコンテナ -->
-    <main id="main-content" role="main">
+    <main id="main-content" role="main" class="main-container">
       <!-- SC1: 一覧画面 -->
       <section
         id="screen-list"
-        class="screen"
+        class="screen fade-in"
         aria-labelledby="book-list-heading"
       >
         <h2 id="book-list-heading" class="visually-hidden">本の一覧</h2>
@@ -131,46 +136,49 @@
         <!-- 検索・フィルター機能（管理モード時のみ表示） -->
         <div
           id="search-controls"
-          class="search-controls"
+          class="search-controls glass-panel"
           style="display: none"
           role="search"
           aria-label="本を検索"
         >
-          <label for="search-input" class="visually-hidden">本を検索</label>
-          <input
-            type="search"
-            id="search-input"
-            placeholder="本を検索..."
-            class="search-input"
-            aria-describedby="search-hint"
-          />
+          <div class="search-input-wrapper">
+             <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input
+              type="search"
+              id="search-input"
+              placeholder="検索"
+              class="search-input"
+              aria-describedby="search-hint"
+            />
+          </div>
           <span id="search-hint" class="visually-hidden"
             >タイトルまたは著者名で検索できます</span
           >
 
-          <label for="author-filter" class="visually-hidden"
-            >著者で絞り込み</label
-          >
-          <select
-            id="author-filter"
-            class="author-filter"
-            aria-label="著者で絞り込み"
-          >
-            <option value="">すべての著者</option>
-          </select>
+          <div class="filter-actions">
+            <select
+              id="author-filter"
+              class="author-filter"
+              aria-label="著者で絞り込み"
+            >
+              <option value="">すべての著者</option>
+            </select>
 
-          <button
-            id="add-book-btn"
-            class="add-book-button"
-            type="button"
-            aria-label="新しい本を追加"
-          >
-            <span aria-hidden="true">+</span> 新規追加
-          </button>
+            <button
+              id="add-book-btn"
+              class="primary-button"
+              type="button"
+              aria-label="新しい本を追加"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              新規追加
+            </button>
+          </div>
         </div>
 
         <div
           id="book-list"
+          class="book-grid"
           role="list"
           aria-live="polite"
           aria-atomic="false"
@@ -184,15 +192,19 @@
         style="display: none"
         aria-labelledby="detail-heading"
       >
-        <button
-          id="back-btn"
-          class="back-button"
-          type="button"
-          aria-label="一覧に戻る"
-        >
-          <span aria-hidden="true">←</span> 戻る
-        </button>
-        <div id="book-detail-content" role="article">
+        <div class="detail-header">
+            <button
+              id="back-btn"
+              class="back-link"
+              type="button"
+              aria-label="一覧に戻る"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              戻る
+            </button>
+        </div>
+        
+        <div id="book-detail-content" role="article" class="detail-content glass-panel">
           <!-- ここに本の詳細が動的に表示されます -->
         </div>
       </section>
@@ -204,15 +216,18 @@
         style="display: none"
         aria-labelledby="edit-heading"
       >
-        <button
-          id="back-edit-btn"
-          class="back-button"
-          type="button"
-          aria-label="一覧に戻る"
-        >
-          <span aria-hidden="true">←</span> 一覧に戻る
-        </button>
-        <div id="book-edit-content">
+        <div class="detail-header">
+            <button
+              id="back-edit-btn"
+              class="back-link"
+              type="button"
+              aria-label="一覧に戻る"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              キャンセル
+            </button>
+        </div>
+        <div id="book-edit-content" class="edit-content glass-panel">
           <!-- ここに本の追加・編集フォームが動的に表示されます -->
         </div>
       </section>
@@ -228,55 +243,54 @@
       aria-labelledby="auth-modal-title"
     >
       <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content">
+      <div class="modal-content glass-modal">
         <div class="modal-header">
-          <h2 id="auth-modal-title">管理モード認証</h2>
+          <h2 id="auth-modal-title">管理モード</h2>
           <button
             id="close-auth-modal-x"
-            class="close-x"
+            class="close-icon-btn"
             type="button"
             aria-label="認証モーダルを閉じる"
           >
-            <span aria-hidden="true">×</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
         <form class="auth-form" onsubmit="return false;">
-          <label for="auth-email" class="visually-hidden">メールアドレス</label>
-          <input
-            type="email"
-            id="auth-email"
-            placeholder="メールアドレス"
-            class="auth-input"
-            required
-            autocomplete="email"
-            aria-required="true"
-          />
+          <div class="input-group">
+              <label for="auth-email" class="visually-hidden">メールアドレス</label>
+              <input
+                type="email"
+                id="auth-email"
+                placeholder="メールアドレス"
+                class="modern-input"
+                required
+                autocomplete="email"
+                aria-required="true"
+              />
+          </div>
 
-          <label for="auth-password" class="visually-hidden">パスワード</label>
-          <input
-            type="password"
-            id="auth-password"
-            placeholder="パスワード"
-            class="auth-input"
-            required
-            autocomplete="current-password"
-            aria-required="true"
-          />
+          <div class="input-group">
+              <label for="auth-password" class="visually-hidden">パスワード</label>
+              <input
+                type="password"
+                id="auth-password"
+                placeholder="パスワード"
+                class="modern-input"
+                required
+                autocomplete="current-password"
+                aria-required="true"
+              />
+          </div>
 
           <button
             id="auth-login-btn"
-            class="auth-button"
+            class="primary-button full-width"
             type="submit"
             aria-label="ログイン"
           >
             ログイン
           </button>
         </form>
-        <div class="modal-buttons">
-          <button id="close-auth-modal-btn" class="close-button" type="button">
-            キャンセル
-          </button>
-        </div>
       </div>
     </div>
 
@@ -290,42 +304,35 @@
       aria-labelledby="prompt-modal-title"
     >
       <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content">
+      <div class="modal-content glass-modal">
         <div class="modal-header">
-          <h2 id="prompt-modal-title">上司と対話するプロンプト</h2>
+          <h2 id="prompt-modal-title">AIプロンプト</h2>
           <button
             id="close-modal-x"
-            class="close-x"
+            class="close-icon-btn"
             type="button"
             aria-label="プロンプトモーダルを閉じる"
           >
-            <span aria-hidden="true">×</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
-        <label for="prompt-text" class="visually-hidden"
-          >プロンプトテキスト</label
-        >
-        <textarea
-          id="prompt-text"
-          class="prompt-textarea"
-          readonly
-          aria-label="生成されたプロンプトテキスト"
-          aria-describedby="prompt-description"
-        ></textarea>
-        <p id="prompt-description" class="visually-hidden">
-          このテキストをコピーしてAIチャットで使用できます
-        </p>
+        <div class="prompt-container">
+            <textarea
+              id="prompt-text"
+              class="prompt-textarea modern-input"
+              readonly
+              aria-label="生成されたプロンプトテキスト"
+            ></textarea>
+        </div>
         <div class="modal-buttons">
           <button
             id="copy-btn"
-            class="copy-button"
+            class="primary-button"
             type="button"
             aria-label="プロンプトをクリップボードにコピー"
           >
-            <span aria-hidden="true">📋</span> コピー
-          </button>
-          <button id="close-modal-btn" class="close-button" type="button">
-            閉じる
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+             コピー
           </button>
         </div>
       </div>
@@ -341,32 +348,19 @@
       aria-labelledby="copy-success-title"
     >
       <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content copy-success-content">
-        <div class="modal-header copy-success-header">
-          <h2 id="copy-success-title">
-            <span aria-hidden="true">✨</span> コピー完了
-          </h2>
-          <button
-            id="close-copy-success-x"
-            class="close-x"
-            type="button"
-            aria-label="通知を閉じる"
-          >
-            <span aria-hidden="true">×</span>
-          </button>
+      <div class="modal-content glass-modal center-content">
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#32d74b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
         </div>
-        <div class="copy-success-message">
-          <p>コピーしました。AIに読み込ませて対話しましょう</p>
-        </div>
-        <div class="modal-buttons">
-          <button
+        <h2 id="copy-success-title">コピー完了</h2>
+        <p>AIに貼り付けて対話を開始しましょう</p>
+        <button
             id="close-copy-success-btn"
-            class="close-button"
+            class="secondary-button"
             type="button"
-          >
+        >
             閉じる
-          </button>
-        </div>
+        </button>
       </div>
     </div>
 
@@ -380,36 +374,36 @@
       aria-labelledby="view-password-title"
     >
       <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content">
+      <div class="modal-content glass-modal">
         <div class="modal-header">
-          <h2 id="view-password-title">パスワードを入力してください</h2>
+          <h2 id="view-password-title">パスワード入力</h2>
         </div>
         <form
           class="auth-form"
           id="view-password-form"
           onsubmit="return false;"
         >
-          <label for="view-password-input" class="visually-hidden"
-            >パスワード</label
-          >
-          <input
-            type="password"
-            id="view-password-input"
-            placeholder="パスワード"
-            class="auth-input"
-            required
-            autocomplete="off"
-            aria-required="true"
-          />
+          <div class="input-group">
+              <input
+                type="password"
+                id="view-password-input"
+                placeholder="パスワード"
+                class="modern-input"
+                required
+                autocomplete="off"
+                aria-required="true"
+              />
+          </div>
           <div
             id="view-password-error"
-            style="color: #f5576c; margin-top: 0.5rem; display: none"
+            class="error-message"
+            style="display: none"
           >
             パスワードが正しくありません
           </div>
           <button
             id="view-password-btn"
-            class="auth-button"
+            class="primary-button full-width"
             type="submit"
             aria-label="パスワードを確認"
           >
@@ -429,37 +423,34 @@
       aria-labelledby="chat-modal-title"
     >
       <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content chat-modal-content">
+      <div class="modal-content chat-modal-content glass-modal">
         <div class="modal-header">
-          <div>
-            <h2 id="chat-modal-title" style="margin-bottom: 0.25rem; font-size: 1.25rem;">AI読書パートナー</h2>
-            <p id="chat-modal-book-title" style="font-size: 0.9rem; opacity: 0.9; font-weight: normal;">本を選択中...</p>
+          <div class="chat-header-info">
+            <h2 id="chat-modal-title">AI読書パートナー</h2>
+            <p id="chat-modal-book-title" class="chat-book-title">本を選択中...</p>
           </div>
           <button
             id="close-chat-modal-x"
-            class="close-x"
+            class="close-icon-btn"
             type="button"
             aria-label="チャットを閉じる"
           >
-            <span aria-hidden="true">×</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
         <div class="chat-container">
           <iframe
             id="dify-chatbot-iframe"
             src=""
-            style="width: 100%; height: 100%; border: none"
-            frameborder="0"
+            title="Dify Chatbot"
             allow="microphone"
           >
           </iframe>
         </div>
         <div class="modal-footer">
-           <button id="chat-copy-info-btn" class="copy-button" type="button" style="margin-right: auto;">
-            <span aria-hidden="true">📋</span> 本の情報をコピー
-          </button>
-          <button id="close-chat-modal-btn" class="close-button" type="button">
-            閉じる
+           <button id="chat-copy-info-btn" class="secondary-button" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+             本の情報をコピー
           </button>
         </div>
       </div>
@@ -483,10 +474,18 @@
       aria-live="polite"
     >
       <div class="loading-spinner">
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <div class="spinner-ring"></div>
-        <p class="loading-text">読み込み中...</p>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
+        <div class="spinner-blade"></div>
       </div>
     </div>
 
