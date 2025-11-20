@@ -299,75 +299,7 @@
       </div>
     </div>
 
-    <!-- プロンプト表示モーダル -->
-    <div
-      id="prompt-modal"
-      class="modal"
-      style="display: none"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="prompt-modal-title"
-    >
-      <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content glass-modal">
-        <div class="modal-header">
-          <h2 id="prompt-modal-title">AIプロンプト</h2>
-          <button
-            id="close-modal-x"
-            class="close-icon-btn"
-            type="button"
-            aria-label="プロンプトモーダルを閉じる"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-        <div class="prompt-container">
-            <textarea
-              id="prompt-text"
-              class="prompt-textarea modern-input"
-              readonly
-              aria-label="生成されたプロンプトテキスト"
-            ></textarea>
-        </div>
-        <div class="modal-buttons">
-          <button
-            id="copy-btn"
-            class="primary-button"
-            type="button"
-            aria-label="プロンプトをクリップボードにコピー"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-             コピー
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- コピー成功モーダル -->
-    <div
-      id="copy-success-modal"
-      class="modal copy-success-modal"
-      style="display: none"
-      role="alert"
-      aria-live="assertive"
-      aria-labelledby="copy-success-title"
-    >
-      <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content glass-modal center-content">
-        <div class="success-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#32d74b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        </div>
-        <h2 id="copy-success-title">コピー完了</h2>
-        <p>AIに貼り付けて対話を開始しましょう</p>
-        <button
-            id="close-copy-success-btn"
-            class="secondary-button"
-            type="button"
-        >
-            閉じる
-        </button>
-      </div>
-    </div>
 
     <!-- 閲覧パスワードモーダル -->
     <div

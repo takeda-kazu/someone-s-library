@@ -275,23 +275,6 @@ function setupEventListeners() {
     ?.addEventListener("click", () => showEditScreen());
 
   // モーダルクローズ
-  document
-    .getElementById("close-modal-x")
-    ?.addEventListener("click", closePromptModal);
-  document
-    .getElementById("close-modal-btn")
-    ?.addEventListener("click", closePromptModal);
-  document
-    .getElementById("copy-btn")
-    ?.addEventListener("click", copyPromptText);
-
-  document
-    .getElementById("close-copy-success-x")
-    ?.addEventListener("click", closeCopySuccessModal);
-  document
-    .getElementById("close-copy-success-btn")
-    ?.addEventListener("click", closeCopySuccessModal);
-
   // チャットモーダル
   document
     .getElementById("close-chat-modal-x")
@@ -465,18 +448,16 @@ function showBookDetailWithoutHistory(bookId) {
         ${
           currentMode === "admin"
             ? `
-            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
-                <button onclick="showEditScreen(${bookId})" class="admin-button" style="flex: 1; min-width: 120px;">編集</button>
-                <button onclick="generatePrompt(${bookId})" class="copy-button" style="flex: 1; min-width: 120px;">プロンプト生成</button>
-                <button onclick="openChat(${bookId})" class="chat-button" style="flex: 1; min-width: 120px;">
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
+                <button onclick="showEditScreen(${bookId})" class="admin-button" style="flex: 0 1 auto; min-width: 120px;">編集</button>
+                <button onclick="openChat(${bookId})" class="chat-button-modern" style="flex: 0 1 auto; min-width: 200px;">
                     <span aria-hidden="true">🤖</span> AIと対話
                 </button>
             </div>
         `
             : `
-            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
-                <button onclick="generatePrompt(${bookId})" class="copy-button" style="flex: 1; min-width: 120px;">プロンプト生成</button>
-                <button onclick="openChat(${bookId})" class="chat-button" style="flex: 1; min-width: 120px;">
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
+                <button onclick="openChat(${bookId})" class="chat-button-modern" style="flex: 0 1 auto; min-width: 200px;">
                     <span aria-hidden="true">🤖</span> AIと対話
                 </button>
             </div>
@@ -593,68 +574,7 @@ async function handleLogin(e) {
   }
 }
 
-// プロンプト生成
-function generatePrompt(bookId) {
-  const book = booksData.find((b) => b.id === bookId);
-  if (!book) return;
-
-  const prompt = `以下は私が読んだ本「${book.title}」（著者: ${
-    book.author
-  }）についての記録です。
-
-【概要】
-${book.description}
-
-【私のレビュー】
-${book.review}
-
-【学んだこと・インサイト】
-${book.insights}
-
-【キーワード】
-${book.keywords.join(", ")}
-
-この本の内容を踏まえて、私の仕事や人生にどのように活かせるか、具体的なアクションプランを提案してください。`;
-
-  document.getElementById("prompt-text").value = prompt;
-  document.getElementById("prompt-modal").style.display = "flex";
-}
-
-function closePromptModal() {
-  document.getElementById("prompt-modal").style.display = "none";
-}
-
-async function copyPromptText() {
-  const promptText = document.getElementById("prompt-text");
-
-  try {
-    await navigator.clipboard.writeText(promptText.value);
-    closePromptModal();
-    showCopySuccessModal();
-  } catch (error) {
-    console.error("コピーに失敗しました:", error);
-    // フォールバック: 古い方法を試す
-    promptText.select();
-    try {
-      document.execCommand("copy");
-      closePromptModal();
-      showCopySuccessModal();
-    } catch (fallbackError) {
-      showToast("コピーに失敗しました。手動でコピーしてください。", "error");
-    }
-  }
-}
-
-function showCopySuccessModal() {
-  document.getElementById("copy-success-modal").style.display = "flex";
-  setTimeout(() => {
-    closeCopySuccessModal();
-  }, 3000);
-}
-
-function closeCopySuccessModal() {
-  document.getElementById("copy-success-modal").style.display = "none";
-}
+// プロンプト生成機能は削除されました
 
 // 検索・フィルター
 function filterBooks() {
@@ -1206,13 +1126,24 @@ function openChat(bookId) {
     const summaryText = `\n【要約】\n${book.summary || 'なし'}`;
     const introText = `\n\n【導入・紹介】\n${book.introduction || book.description || 'なし'}`;
     
-    const limitedQuotes = (book.quotes || []).slice(0, 3);
-    const limitedReflections = (book.reflections || []).slice(0, 3);
-    const quotesText = limitedQuotes.length > 0 ? `\n\n【引用(一部)】\n` + limitedQuotes.map(q => `・${q.title}\n  "${q.content}"`).join('\n') : '';
-    const reflectionsText = limitedReflections.length > 0 ? `\n\n【考察(一部)】\n` + limitedReflections.map(r => `・${r.title}\n  ${r.content}`).join('\n') : '';
+    // 引用と考察をすべて取得
+    let quotesAndReflectionsText = "";
+    const quotes = book.quotes || [];
+    const reflections = book.reflections || [];
+    const maxLength = Math.max(quotes.length, reflections.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        if (quotes[i]) {
+            quotesAndReflectionsText += `\n\n【引用${i + 1}: ${quotes[i].title}】\n"${quotes[i].content}"\n(p.${quotes[i].pageNumber})`;
+        }
+        if (reflections[i]) {
+            quotesAndReflectionsText += `\n\n【考察${i + 1}: ${reflections[i].title}】\n${reflections[i].content}`;
+        }
+    }
+
     const keywordsText = (book.keywords && book.keywords.length > 0) ? `\n\n【キーワード】\n${book.keywords.join(', ')}` : '';
 
-    const fullContentForCopy = baseInfo + summaryText + introText + quotesText + reflectionsText + keywordsText;
+    const fullContentForCopy = baseInfo + summaryText + introText + quotesAndReflectionsText + keywordsText;
 
     // Dify用のコンテンツ（簡潔版 - 要約と導入のみ）
     const difyContent = `${book.summary || ''}\n\n${book.introduction || book.description || ''}`.trim();

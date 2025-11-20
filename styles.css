@@ -624,8 +624,9 @@ body {
 
 /* Chat Modal Specifics */
 .chat-modal-content {
-  max-width: 800px;
-  height: 80vh;
+  width: 95%;
+  max-width: 1000px;
+  height: 90vh;
 }
 
 .chat-header-info {
@@ -651,39 +652,34 @@ body {
   justify-content: flex-end;
 }
 
-/* Prompt Modal */
-.prompt-container {
-  padding: var(--space-lg);
-  flex: 1;
-  overflow: hidden;
+/* Modern Chat Button */
+.chat-button-modern {
+  background: linear-gradient(135deg, #5e5ce6 0%, #bf5af2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-full);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(94, 92, 230, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.prompt-textarea {
-  height: 100%;
-  min-height: 200px;
-  font-family: "SF Mono", "Menlo", monospace;
-  font-size: 13px;
+.chat-button-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(94, 92, 230, 0.4);
+  filter: brightness(1.1);
 }
 
-/* Copy Success Modal */
-.center-content {
-  text-align: center;
-  padding: var(--space-xl);
-  max-width: 320px;
-}
-
-.success-icon {
-  margin-bottom: var(--space-md);
-}
-
-.copy-success-modal h2 {
-  font-size: 20px;
-  margin-bottom: var(--space-sm);
-}
-
-.copy-success-modal p {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-lg);
+.chat-button-modern:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(94, 92, 230, 0.3);
 }
 
 /* Loading Indicator (iOS Spinner) */
