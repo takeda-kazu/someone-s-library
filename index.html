@@ -8,21 +8,11 @@
       content="個人の本棚管理システム - 読書記録と感想を保存・共有"
     />
     <meta name="theme-color" content="#000000" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://udify.app https://*.udify.app https://cdnjs.cloudflare.com https://googletagmanager.com https://www.googletagmanager.com https://analytics.google.com https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self' data:; connect-src 'self' https://www.gstatic.com https://firebasestorage.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://udify.app https://*.udify.app https://googletagmanager.com https://www.googletagmanager.com https://analytics.google.com https://api.github.com; frame-src 'self' https://udify.app https://*.udify.app; media-src 'self' https://udify.app https://*.udify.app;">
     <title>〇〇本棚 - Library Watch</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="styles.css?v=2" />
-
-    <!-- GZIP圧縮ライブラリ (Dify inputs エンコード用) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js" integrity="sha512-g2TeAWw5GPnX56pwUYgbo1ksz7RGvCV6/Ysla2cLK1fmMySTn7aa1Y2VH39R0LV1AVK1joOZP8SbBG5YMkMXuQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-    <!-- Firebase SDK -->
-    <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-      import {
-        getAuth,
-        signInWithEmailAndPassword,
         signOut,
         onAuthStateChanged,
       } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
