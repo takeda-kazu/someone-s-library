@@ -13,62 +13,14 @@
     <meta http-equiv="Expires" content="0" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://udify.app https://*.udify.app https://cdnjs.cloudflare.com https://googletagmanager.com https://www.googletagmanager.com https://analytics.google.com https://api.github.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: http:; font-src 'self' data:; connect-src 'self' https://www.gstatic.com https://firebasestorage.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://udify.app https://*.udify.app https://googletagmanager.com https://www.googletagmanager.com https://analytics.google.com https://api.github.com; frame-src 'self' https://udify.app https://*.udify.app; media-src 'self' https://udify.app https://*.udify.app;">
     <title>〇〇本棚 - Library Watch</title>
-        signOut,
-        onAuthStateChanged,
-      } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-      import {
-        getFirestore,
-        collection,
-        doc,
-        addDoc,
-        setDoc,
-        updateDoc,
-        deleteDoc,
-        getDocs,
-        query,
-        orderBy,
-        getDoc,
-      } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- pako for gzip compression -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+  </head>
+  <body>
+    <div class="ambient-background"></div>
 
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyBs8q4LIEnYpqk_PzaJwZO7I7C9gWu6MIk",
-        authDomain: "library-6632c.firebaseapp.com",
-        projectId: "library-6632c",
-        storageBucket: "library-6632c.firebasestorage.app",
-        messagingSenderId: "475019124517",
-        appId: "1:475019124517:web:69e3e6d5d81467a61944cc",
-        measurementId: "G-8GWPSS67D1",
-      };
-
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      // グローバル変数として設定
-      window.firebaseApp = app;
-      window.firebaseAuth = auth;
-      window.firebaseDb = db;
-
-      // Firestore関数もグローバルに公開
-      window.firestore = {
-        collection,
-        doc,
-        addDoc,
-        setDoc,
-        updateDoc,
-        deleteDoc,
-        getDocs,
-        getDoc,
-        query,
-        orderBy,
-      };
-
-      // Firebase Auth関数もグローバルに公開
-      window.firebaseAuthFunctions = {
-        signInWithEmailAndPassword,
-        signOut,
     <!-- ヘッダー: アプリのタイトルとナビゲーション -->
     <header id="app-header" role="banner" class="glass-header">
       <div class="header-content">
@@ -276,57 +228,6 @@
       </div>
     </div>
 
-
-
-    <!-- 閲覧パスワードモーダル -->
-    <div
-      id="view-password-modal"
-      class="modal"
-      style="display: none"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="view-password-title"
-    >
-      <div class="modal-overlay" aria-hidden="true"></div>
-      <div class="modal-content glass-modal">
-        <div class="modal-header">
-          <h2 id="view-password-title">パスワード入力</h2>
-        </div>
-        <form
-          class="auth-form"
-          id="view-password-form"
-          onsubmit="return false;"
-        >
-          <div class="input-group">
-              <input
-                type="password"
-                id="view-password-input"
-                placeholder="パスワード"
-                class="modern-input"
-                required
-                autocomplete="off"
-                aria-required="true"
-              />
-          </div>
-          <div
-            id="view-password-error"
-            class="error-message"
-            style="display: none"
-          >
-            パスワードが正しくありません
-          </div>
-          <button
-            id="view-password-btn"
-            class="primary-button full-width"
-            type="submit"
-            aria-label="パスワードを確認"
-          >
-            確認
-          </button>
-        </form>
-      </div>
-    </div>
-
     <!-- AIチャットモーダル -->
     <div
       id="chat-modal"
@@ -401,6 +302,7 @@
         <div class="spinner-blade"></div>
         <div class="spinner-blade"></div>
       </div>
+      <span class="visually-hidden loading-text">読み込み中...</span>
     </div>
 
     <!-- トースト通知コンテナ -->
@@ -410,5 +312,7 @@
       aria-live="polite"
       aria-atomic="true"
     ></div>
+
+    <script type="module" src="js/main.js"></script>
   </body>
 </html>
