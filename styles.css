@@ -624,9 +624,9 @@ body {
 
 /* Chat Modal Specifics */
 .chat-modal-content {
-  width: 95%;
-  max-width: 1000px;
-  height: 90vh;
+  width: 95% !important;
+  max-width: 1000px !important;
+  height: 90vh !important;
 }
 
 .chat-header-info {

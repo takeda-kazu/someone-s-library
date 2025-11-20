@@ -1121,8 +1121,10 @@ function openChat(bookId) {
         modalTitle.textContent = book.title;
     }
 
-    // コンテンツの構築（コピー用に完全版を保持）
-    const baseInfo = `【タイトル】${book.title}\n【著者】${book.author}\n`;
+    // クリップボードにコピーするテキストの構築（タイトルと著者は除外）
+    // const baseInfo = `【タイトル】${book.title}\n【著者】${book.author}\n\n`;
+    const baseInfo = ""; // タイトルと著者は含めない
+
     const summaryText = `\n【要約】\n${book.summary || 'なし'}`;
     const introText = `\n\n【導入・紹介】\n${book.introduction || book.description || 'なし'}`;
     
