@@ -259,9 +259,9 @@ body {
 
 /* Search & Filter */
 .glass-panel {
-  background: var(--glass-material);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(30, 30, 30, 0.5);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
 }
