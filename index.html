@@ -15,6 +15,10 @@
 
     <!-- ヘッダー: アプリのタイトルとナビゲーション -->
     <header id="app-header" role="banner" class="glass-header">
+    <div class="header-content">
+      <h1 id="app-title">Someone's Library</h1>
+      <div class="header-actions">
+          <button
             id="admin-mode-btn"
             class="icon-button"
             aria-label="管理モードに切り替え"
@@ -32,7 +36,16 @@
             title="通常モード"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      >
+          </button>
+      </div>
+    </div>
+    </header>
+
+    <main class="main-container">
+      <!-- SC1: 本の一覧画面 -->
+      <section
+        id="screen-list"
+        class="screen"
         <h2 id="book-list-heading" class="visually-hidden">本の一覧</h2>
 
         <!-- 検索・フィルター機能（管理モード時のみ表示） -->
