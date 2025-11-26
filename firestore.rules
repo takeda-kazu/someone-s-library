@@ -8,22 +8,13 @@ service cloud.firestore {
       allow write: if request.auth != null;
       
       // 読みたい: 読み書き誰でも可（匿名対応）
-      match /wantToRead/{odcId} {
-        allow read: if true;
-        allow create: if true;
-        // 削除は誰でも可（クライアント側でodcIdを検証）
-        allow delete: if true;
+      match /wantToRead/{docId} {
+        allow read, write: if true;
       }
       
-      // コメント: 読み取りは誰でも可
+      // コメント: 読み書き誰でも可（匿名対応）
       match /comments/{commentId} {
-        allow read: if true;
-        // 作成は誰でも可（文字数制限付き）
-        allow create: if request.resource.data.content.size() <= 500
-                      && request.resource.data.authorName.size() <= 50;
-        // 更新・削除は誰でも可（クライアント側でauthorIdを検証）
-        // 管理者（認証ユーザー）も削除可
-        allow update, delete: if true;
+        allow read, write: if true;
       }
     }
   }
