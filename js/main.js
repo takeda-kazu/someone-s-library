@@ -7,7 +7,11 @@ import {
   showEditScreenWithoutHistory, 
   showEditScreen, 
   filterBooks, 
-  closeChatModal 
+  closeChatModal,
+  closeNameInputModal,
+  handleNameSubmit,
+  closeDeleteConfirmModal,
+  confirmDeleteComment
 } from "./ui.js";
 
 // Initialize App
@@ -78,4 +82,27 @@ function setupEventListeners() {
   // Chat Modal
   document.getElementById("close-chat-modal-x")?.addEventListener("click", closeChatModal);
   document.getElementById("close-chat-modal-btn")?.addEventListener("click", closeChatModal);
+
+  // Name Input Modal
+  document.getElementById("close-name-modal")?.addEventListener("click", closeNameInputModal);
+  document.getElementById("name-submit-btn")?.addEventListener("click", handleNameSubmit);
+  document.getElementById("name-form")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleNameSubmit();
+  });
+
+  // Delete Confirm Modal
+  document.getElementById("close-confirm-delete-modal")?.addEventListener("click", closeDeleteConfirmModal);
+  document.getElementById("cancel-delete-btn")?.addEventListener("click", closeDeleteConfirmModal);
+  document.getElementById("confirm-delete-btn")?.addEventListener("click", confirmDeleteComment);
+
+  // Modal overlay click to close
+  document.querySelectorAll('.modal').forEach(modal => {
+    const overlay = modal.querySelector('.modal-overlay');
+    if (overlay) {
+      overlay.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+    }
+  });
 }

@@ -8,7 +8,7 @@
       content="個人の本棚管理システム - 読書記録と感想を保存・共有"
     />
     <meta name="theme-color" content="#000000" />
-    <link rel="stylesheet" href="css/styles.css?v=5" />
+    <link rel="stylesheet" href="css/styles.css?v=6" />
   </head>
   <body>
     <div class="ambient-background"></div>
@@ -295,6 +295,83 @@
       aria-live="polite"
       aria-atomic="true"
     ></div>
+
+    <!-- 名前入力モーダル -->
+    <div
+      id="name-input-modal"
+      class="modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="name-modal-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content glass-modal" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 id="name-modal-title">お名前を教えてください</h2>
+          <button
+            id="close-name-modal"
+            class="close-icon-btn"
+            type="button"
+            aria-label="モーダルを閉じる"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <form class="name-form" id="name-form" onsubmit="return false;">
+          <p>
+            「読みたい」やコメント投稿時に表示されます。<br>
+            ニックネームでもOKです。
+          </p>
+          <div class="input-group">
+            <label for="user-name-input" class="visually-hidden">お名前</label>
+            <input
+              type="text"
+              class="modern-input"
+              id="user-name-input"
+              placeholder="例: 山田太郎"
+              maxlength="50"
+              required
+            />
+          </div>
+          <button type="submit" id="name-submit-btn" class="primary-button full-width" style="margin-top: 16px;">
+            登録する
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 削除確認モーダル -->
+    <div
+      id="confirm-delete-modal"
+      class="modal"
+      style="display: none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-delete-title"
+    >
+      <div class="modal-overlay" aria-hidden="true"></div>
+      <div class="modal-content glass-modal" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 id="confirm-delete-title">コメントを削除</h2>
+          <button
+            id="close-confirm-delete-modal"
+            class="close-icon-btn"
+            type="button"
+            aria-label="モーダルを閉じる"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+        <div class="name-form">
+          <p>このコメントを削除してもよろしいですか？</p>
+          <div style="display: flex; gap: 12px; margin-top: 20px;">
+            <button id="cancel-delete-btn" class="secondary-button" style="flex: 1;">キャンセル</button>
+            <button id="confirm-delete-btn" class="primary-button" style="flex: 1; background: var(--accent-red);">削除する</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="js/main.js"></script>
   </body>
